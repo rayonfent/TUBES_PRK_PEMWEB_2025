@@ -50,27 +50,29 @@ Rumus:
 
 Klasifikasi:
 -	direct_score ≥ 2 → Direct Communicator
-•	gentle_score ≥ 2 → Empathic Communicator
-•	Jika seimbang → Balanced Communicator
-###) 4.2 Penentuan Tipe Emosional (Logical vs Emotional)
-•	Berdasarkan q4:
-o	q4 = 1 → Logical Thinker
-o	q4 = 2 → Emotional Feeler
-###) 4.3 Penentuan Tipe Kepribadian Final
-•	Direct + Logical → Analytical Realist
-•	Direct + Emotional → Straightforward Feeler
-•	Gentle + Logical → Calm Rationalist
-•	Gentle + Emotional → Empathic Listener
-•	Jika tidak dominan → Adaptive Communicator
-##) 5. Algoritma Matching Konselor
-###) 5.1 Atribut Konselor
-•	communication_style
-o	1 = direct
-o	2 = gentle
-•	approach_style
-o	1 = logical
-o	2 = emotional
-###) 5.2 Perhitungan Skor Kecocokan
+-	gentle_score ≥ 2 → Empathic Communicator
+-	Jika seimbang → Balanced Communicator
+  
+### 4.2 Penentuan Tipe Emosional (Logical vs Emotional)
+-	Berdasarkan q4:
+    -	q4 = 1 → Logical Thinker
+    -	q4 = 2 → Emotional Feeler
+      
+### 4.3 Penentuan Tipe Kepribadian Final
+-	Direct + Logical → Analytical Realist
+-	Direct + Emotional → Straightforward Feeler
+-	Gentle + Logical → Calm Rationalist
+-	Gentle + Emotional → Empathic Listener
+-	Jika tidak dominan → Adaptive Communicator
+## 5. Algoritma Matching Konselor
+### 5.1 Atribut Konselor
+-	communication_style
+    -	1 = direct
+    -	2 = gentle
+-	approach_style
+    -	1 = logical
+    -	2 = emotional
+### 5.2 Perhitungan Skor Kecocokan
 Rumus:
 - score = 0
 - Jika q1 == communication_style → score + 1

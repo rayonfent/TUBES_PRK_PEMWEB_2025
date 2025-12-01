@@ -205,21 +205,23 @@ function load_view($path) {
     © <?=date('Y')?> Astral Psychologist
 </footer>
 
+<?php endif; ?>   <!-- FIX: menutup if ($p === 'home'): -->
+
 <?php
 if (isset($_GET['p'])) {
 
     switch ($_GET['p']) {
 
-        case 'user_dashboard':
-            include "src/views/dashboard/user_dashboard.php";
+       case 'user_dashboard':
+            include __DIR__ . "/views/dashboard/user_dashboard.php";
             break;
 
         case 'konselor_dashboard':
-            include "src/views/dashboard/konselor_dashboard.php";
+            include __DIR__ . "/views/dashboard/konselor_dashboard.php";
             break;
 
         case 'admin_dashboard':
-            include "src/views/dashboard/admin_dashboard.php";
+            include __DIR__ . "/views/dashboard/admin_dashboard.php";
             break;
 
         case 'login':

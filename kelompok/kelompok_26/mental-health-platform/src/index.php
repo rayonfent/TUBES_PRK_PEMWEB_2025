@@ -61,7 +61,8 @@ function load_view($path) {
 
 <body>
 
-<!-- NAVBAR -->
+<!-- NAVBAR (visible only on homepage) -->
+<?php if ($p === 'home'): ?>
 <header class="fixed top-0 w-full bg-white/80 backdrop-blur-md soft-shadow z-50">
     <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
         <div class="flex items-center gap-3">
@@ -77,6 +78,7 @@ function load_view($path) {
         </nav>
     </div>
 </header>
+<?php endif; ?>
 
 
 <?php if ($p === 'home'): ?>

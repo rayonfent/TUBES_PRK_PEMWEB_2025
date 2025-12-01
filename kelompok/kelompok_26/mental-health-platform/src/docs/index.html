@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mental Health Platform — Project Docs</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header>
+      <h1>Mental Health Platform</h1>
+      <p>Ringkasan proyek dan daftar file — static docs generated for quick browsing.</p>
+      <nav>
+        <a href="./index.html">Summary</a>
+        <a href="#files">File index</a>
+        <a href="../../PROJECT_MEMORY.md">PROJECT_MEMORY.md</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="summary">
+        <h2>Ringkasan</h2>
+        <p>Ini adalah ringkasan otomatis yang dibuat dari repo. Gunakan daftar file di bawah untuk menavigasi struktur dan melihat file penting.</p>
+      </section>
+
+      <section id="files">
+        <h2>Daftar File Penting</h2>
+        <div id="fileList">Memuat...</div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Generated: 2025-12-01 — Static docs created by assistant</p>
+    </footer>
+
+    <script>
+      async function loadFiles(){
+        try{
+          const resp = await fetch('files.json');
+          const data = await resp.json();
+          const wrap = document.getElementById('fileList');
+          wrap.innerHTML = '';
+          const ul = document.createElement('ul');
+          data.files.forEach(f => {
+            const li = document.createElement('li');
+            const path = document.createElement('code');
+            path.textContent = f.path;
+            const desc = document.createElement('span');
+            desc.textContent = ' — ' + f.desc;
+            li.appendChild(path);
+            li.appendChild(desc);
+            ul.appendChild(li);
+          });
+          wrap.appendChild(ul);
+        }catch(e){
+          document.getElementById('fileList').textContent = 'Gagal memuat index: ' + e.message;
+        }
+      }
+      loadFiles();
+    </script>
+  </body>
+</html>

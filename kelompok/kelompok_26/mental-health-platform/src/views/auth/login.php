@@ -12,24 +12,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // cek email
+    // cek email di users
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $res = $stmt->get_result();
 
     if ($res->num_rows === 0) {
-        $login_error = "Email atau password salah.";
+        // Jika tidak ditemukan di users, cek di konselor
+        $stmt2 = $conn->prepare("SELECT * FROM konselor WHERE email = ? LIMIT 1");
+        $stmt2->bind_param("s", $email);
+        $stmt2->execute();
+        $res2 = $stmt2->get_result();
+        if ($res2->num_rows === 0) {
+            $login_error = "Email atau password salah.";
+        } else {
+            $konselor = $res2->fetch_assoc();
+            if (!password_verify($password, $konselor['password'])) {
+                $login_error = "Email atau password salah.";
+            } else {
+                // LOGIN SUKSES KONSELOR
+                session_start();
+                $_SESSION['konselor'] = $konselor;
+                echo "<script>window.location='index.php?p=konselor_dashboard';</script>";
+                exit;
+            }
+        }
     } else {
         $user = $res->fetch_assoc();
-
         if (!password_verify($password, $user['password'])) {
             $login_error = "Email atau password salah.";
         } else {
             // LOGIN SUKSES
             session_start();
             $_SESSION['user'] = $user;
-
             // === ROLE-BASED REDIRECT ===
             if ($user['role'] === 'admin') {
                 echo "<script>window.location='index.php?p=admin_dashboard';</script>";
@@ -40,7 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             else { // user biasa
                 echo "<script>window.location='index.php?p=user_dashboard';</script>";
             }
-
             exit;
         }
     }
@@ -54,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <h2 class="text-3xl font-bold text-center text-[#17252A]">Masuk ke Astral Psychologist</h2>
         <p class="text-center text-gray-500 mt-2 text-sm">Selamat datang kembali.</p>
 
-        <!-- ERROR box langsung di halaman yang sama -->
         <?php if (!empty($login_error)): ?>
             <div class="mt-6 mb-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm animate-fade">
                 <?= $login_error ?>

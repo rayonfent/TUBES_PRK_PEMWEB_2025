@@ -67,10 +67,11 @@ $admin = $_SESSION['user'];
       <!-- compact topbar (header removed for a clean workspace) -->
       <div class="flex items-center justify-between mb-6 p-2">
         <div class="text-sm text-gray-500 font-medium">Admin Control Center</div>
-        <div class="flex items-center gap-3">
-          <div class="text-xs text-gray-500">Selamat datang, <strong><?= htmlspecialchars($admin['name'] ?? $admin['email']) ?></strong></div>
-          <a href="controllers/handle_auth.php?action=logout" class="px-3 py-2 border rounded-lg text-xs">Keluar</a>
-        </div>
+          <div class="flex items-center gap-3">
+            <div class="text-xs text-gray-500">Selamat datang, <strong><?= htmlspecialchars($admin['name'] ?? $admin['email']) ?></strong></div>
+            <!-- header shortcuts intentionally kept minimal -->
+            <a href="controllers/handle_auth.php?action=logout" class="px-3 py-2 border rounded-lg text-xs">Keluar</a>
+          </div>
       </div>
 
       <!-- top shortcuts intentionally removed — navigation through left sidebar -->
@@ -82,19 +83,19 @@ $admin = $_SESSION['user'];
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <div class="p-4 bg-white rounded-xl border shadow-sm min-h-[88px]">
               <div class="text-xs text-gray-500">Total Users</div>
-              <div class="text-3xl font-bold" id="stat_total_users">1,245</div>
+              <div class="text-3xl font-bold" id="stat_total_users">Loading...</div>
             </div>
             <div class="p-4 bg-white rounded-xl border shadow-sm min-h-[88px]">
               <div class="text-xs text-gray-500">Active Sessions</div>
-              <div class="text-3xl font-bold" id="stat_active_sessions">32</div>
+              <div class="text-3xl font-bold" id="stat_active_sessions">Loading...</div>
             </div>
             <div class="p-4 bg-white rounded-xl border shadow-sm min-h-[88px]">
               <div class="text-xs text-gray-500">Konselor Aktif</div>
-              <div class="text-3xl font-bold" id="stat_active_konselor">12</div>
+              <div class="text-3xl font-bold" id="stat_active_konselor">Loading...</div>
             </div>
             <div class="p-4 bg-white rounded-xl border shadow-sm min-h-[88px]">
               <div class="text-xs text-gray-500">Total Messages</div>
-              <div class="text-3xl font-bold" id="stat_total_messages">9,932</div>
+              <div class="text-3xl font-bold" id="stat_total_messages">Loading...</div>
             </div>
           </div>
 
@@ -146,13 +147,23 @@ $admin = $_SESSION['user'];
           <div class="bg-white rounded-xl border p-4 shadow-sm mb-6">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold">Kelola User</h3>
-              <div>
+              <div class="flex items-center gap-2">
                 <button type="button" id="btnAddUser" class="px-3 py-2 text-sm bg-[#0779e4] text-white rounded-lg">Tambah User</button>
               </div>
             </div>
 
-            <div>
-              <table class="w-full text-sm" id="usersTable">
+            <div class="mb-6">
+              <div class="mb-3"><strong>Users & Admins</strong></div>
+              <table class="w-full text-sm mb-6" id="usersTable" style="table-layout:fixed;">
+                <colgroup>
+                  <col style="width:8%">
+                  <col style="width:18%">
+                  <col style="width:30%">
+                  <col style="width:10%">
+                  <col style="width:10%">
+                  <col style="width:14%">
+                  <col style="width:10%">
+                </colgroup>
                 <thead>
                   <tr class="text-left text-gray-600">
                     <th class="p-2">ID</th>
@@ -166,6 +177,33 @@ $admin = $_SESSION['user'];
                 </thead>
                 <tbody id="usersTbody">
                   <!-- rows filled by JS -->
+                </tbody>
+              </table>
+
+              <div class="mb-3 mt-4"><strong>Konselor</strong></div>
+              <table class="w-full text-sm" id="konselorsTable" style="table-layout:fixed;">
+                <colgroup>
+                  <col style="width:8%">
+                  <col style="width:18%">
+                  <col style="width:30%">
+                  <col style="width:10%">
+                  <col style="width:10%">
+                  <col style="width:14%">
+                  <col style="width:10%">
+                </colgroup>
+                <thead>
+                  <tr class="text-left text-gray-600">
+                    <th class="p-2">K ID</th>
+                    <th class="p-2">Nama</th>
+                    <th class="p-2">Email</th>
+                    <th class="p-2">Role</th>
+                    <th class="p-2">Status</th>
+                    <th class="p-2">Terdaftar</th>
+                    <th class="p-2">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="konselorsTbody">
+                  <!-- konselor rows filled by JS -->
                 </tbody>
               </table>
             </div>
@@ -221,6 +259,7 @@ $admin = $_SESSION['user'];
         <select id="m_role">
           <option value="user">User</option>
           <option value="admin">Admin</option>
+          <option value="konselor">Konselor</option>
         </select>
       </div>
     </div>
@@ -272,7 +311,7 @@ $admin = $_SESSION['user'];
     async function tryFetchServerData(){
       try{
         // use safe relative path (relative to index.php, should resolve correctly)
-        const sResp = await fetch(API_BASE + 'handle_admin.php?action=get_stats');
+        const sResp = await fetch(API_BASE + 'handle_admin.php?action=get_stats', { credentials: 'same-origin' });
         if (!sResp.ok) throw new Error('get_stats returned ' + sResp.status);
         const s = await sResp.json();
         if (!sResp.ok) throw new Error('stats request failed: ' + sResp.status);
@@ -291,29 +330,29 @@ $admin = $_SESSION['user'];
         }
 
         // show raw debug output and make it visible
-        const debugWrap = document.getElementById('adminDebugWrap');
-        const debugEl = document.getElementById('adminDebug');
-        if(debugEl){ debugEl.textContent = JSON.stringify({ok:sResp.ok,stats:s}, null, 2); debugWrap.style.display = 'block'; }
+        console.debug('get_stats response', { ok: sResp.ok, stats: s });
 
-        const usersRespFetch = await fetch(API_BASE + 'handle_admin.php?action=get_users');
+        const usersRespFetch = await fetch(API_BASE + 'handle_admin.php?action=get_users', { credentials: 'same-origin' });
         if (!usersRespFetch.ok) throw new Error('get_users returned ' + usersRespFetch.status);
         const usersResp = await usersRespFetch.json();
         if(usersResp && usersResp.users && Array.isArray(usersResp.users) && usersResp.users.length){
-          // replace local fallback users with server data
-          localUsers.length = 0;
-          usersResp.users.forEach(u => localUsers.push(u));
+            // replace local fallback collections with server data
+            localUsers.length = 0; localKonselors.length = 0;
+            usersResp.users.forEach(u => {
+              const t = u.type ?? (u.role === 'konselor' ? 'konselor' : 'user');
+              if (t === 'konselor') localKonselors.push(u);
+              else localUsers.push(u);
+            });
           renderUsers();
         } else {
-          if(debugEl){ debugEl.textContent = JSON.stringify({ok:usersRespFetch.ok,stats:s, users:usersResp}, null, 2); debugWrap.style.display = 'block'; }
+          console.debug('get_users response', { ok: usersRespFetch.ok, stats: s, users: usersResp });
         }
       }catch(e){
         console.error('Admin data fetch error', e);
         // server unreachable — use fallback local data already present
         console.warn('Admin API unreachable. Using fallback local data.', e);
         // show error in debug panel
-        const debugWrap = document.getElementById('adminDebugWrap');
-        const debugEl = document.getElementById('adminDebug');
-        if(debugEl){ debugEl.textContent = 'Fetch error: ' + (e && e.message ? e.message : String(e)); debugWrap.style.display = 'block'; }
+        console.debug('Admin fetch error', e && e.message ? e.message : String(e));
         // set stat cards to N/A so it's obvious they didn't load
         ['stat_total_users','stat_active_sessions','stat_active_konselor','stat_total_messages','dbConns'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = 'N/A'; });
       }
@@ -328,23 +367,45 @@ $admin = $_SESSION['user'];
     tryFetchServerData();
     setInterval(tryFetchServerData, 5000);
 
-    // initial local user array (used while server responds)
-    const localUsers = [
-      {id:101, name:'Rina S', email:'rina@example.com', role:'user', status:'active'},
-      {id:102, name:'Tegar A', email:'tegar@example.com', role:'user', status:'active'},
-      {id:201, name:'Konselor Joe', email:'joe.k@example.com', role:'konselor', status:'active'},
-      {id:1,   name:'System Admin', email:'admin@site.local', role:'admin', status:'active'},
-    ];
+    // initial local arrays used while server responds
+    // no demo/sample data — keep empty fallbacks so real data from server populates these
+    const localUsers = [];
+    const localKonselors = [];
 
     const tbody = document.getElementById('usersTbody');
+    function formatKonselorId(n){
+      if (typeof n !== 'number') n = parseInt(n) || 0;
+      return n < 10 ? '0' + n : String(n);
+    }
+
     function renderUsers(){
       tbody.innerHTML = '';
+          // render users/admins
           for(const u of localUsers){
+        const type = 'user';
+        const id = u.id;
         const tr = document.createElement('tr');
         const created = u.created_at ? u.created_at : '-';
         const status = u.status ? u.status : '-';
-        tr.innerHTML = `<td class="p-2">${u.id}</td><td class="p-2">${u.name}</td><td class="p-2">${u.email}</td><td class="p-2">${u.role}</td><td class="p-2">${status}</td><td class="p-2">${created}</td><td class="p-2"><button type="button" class='btnEdit px-2 py-1 text-xs border rounded mr-2'>Edit</button><button type="button" class='btnDel px-2 py-1 text-xs border rounded'>Hapus</button></td>`;
+        tr.dataset.type = type;
+        tr.dataset.id = id;
+        tr.innerHTML = `<td class="p-2">${id}</td><td class="p-2">${u.name}</td><td class="p-2">${u.email}</td><td class="p-2">${u.role}</td><td class="p-2">${status}</td><td class="p-2">${created}</td><td class="p-2"><button type="button" data-id="${id}" data-type="${type}" class='btnEdit px-2 py-1 text-xs border rounded mr-2'>Edit</button><button type="button" data-id="${id}" data-type="${type}" class='btnDel px-2 py-1 text-xs border rounded'>Hapus</button></td>`;
         tbody.appendChild(tr);
+      }
+
+      // render konselors separately
+      const ktbody = document.getElementById('konselorsTbody');
+      if (ktbody) ktbody.innerHTML = '';
+      for (const k of localKonselors) {
+        const tr = document.createElement('tr');
+        const kid = k.id;
+        const created = k.created_at ? k.created_at : '-';
+        const status = k.status ? k.status : '-';
+        tr.dataset.type = 'konselor'; tr.dataset.id = kid;
+        const displayId = formatKonselorId(kid);
+        const rowHtml = `<td class="p-2">${displayId}</td><td class="p-2">${k.name}</td><td class="p-2">${k.email}</td><td class="p-2">konselor</td><td class="p-2">${status}</td><td class="p-2">${created}</td><td class="p-2"><button data-id="${kid}" data-type="konselor" class='btnEdit px-2 py-1 text-xs border rounded mr-2'>Edit</button><button data-id="${kid}" data-type="konselor" class='btnDel px-2 py-1 text-xs border rounded'>Hapus</button></td>`;
+        tr.innerHTML = rowHtml;
+        if (ktbody) ktbody.appendChild(tr);
       }
     }
 
@@ -353,6 +414,7 @@ $admin = $_SESSION['user'];
     // Modal state
     let modalMode = 'create'; // or 'edit'
     let editingUserId = null;
+    let editingUserType = 'user';
 
     const modalBackdrop = document.getElementById('modalBackdrop');
     const confirmBackdrop = document.getElementById('confirmBackdrop');
@@ -367,6 +429,7 @@ $admin = $_SESSION['user'];
     function openUserModal(mode='create', user=null){
       modalMode = mode;
       editingUserId = user ? user.id : null;
+      editingUserType = user?.type ?? (user?.role === 'konselor' ? 'konselor' : 'user');
       modalTitle.textContent = mode === 'create' ? 'Tambah User' : 'Edit User';
       mName.value = user?.name ?? '';
       mEmail.value = user?.email ?? '';
@@ -376,7 +439,7 @@ $admin = $_SESSION['user'];
     }
     function closeUserModal(){ modalBackdrop.classList.remove('active'); }
 
-    document.getElementById('btnAddUser').addEventListener('click', ()=> openUserModal('create', null));
+    document.getElementById('btnAddUser').addEventListener('click', ()=> { editingUserType = 'user'; mRole.value = 'user'; openUserModal('create', null); });
 
     modalCancel.addEventListener('click', closeUserModal);
 
@@ -393,15 +456,35 @@ $admin = $_SESSION['user'];
         if(modalMode === 'create'){
           if(!password){ return alert('Password harus diisi untuk user baru'); }
           form.append('password', password);
-          const resp = await fetch(API_BASE + 'handle_admin.php?action=create_user', { method:'POST', body: form });
-          const j = await resp.json();
-          if(!resp.ok || !j.success) throw new Error(j.msg||j.error||'create failed');
+            // choose endpoint for konselor vs normal user
+            let endpoint = 'create_user';
+            if (role === 'konselor') endpoint = 'create_konselor';
+            const resp = await fetch(API_BASE + 'handle_admin.php?action=' + endpoint, { method:'POST', body: form, credentials: 'same-origin' });
+            let j = null;
+            try { j = await resp.json(); } catch(e) { j = null; }
+            if (!resp.ok) {
+              // show server-side error message (don't treat as network failure)
+              const message = j?.error || j?.msg || ('create failed: ' + resp.status);
+              alert('Server error: ' + message);
+              // expose debug
+              console.debug('create response', { status: resp.status, body: j });
+              return;
+            }
+            if(!j.success) { alert('Create failed: ' + (j.error||JSON.stringify(j))); return; }
         } else {
           form.append('id', editingUserId);
           if(password) form.append('password', password); // optional
-          const resp = await fetch(API_BASE + 'handle_admin.php?action=update_user', { method:'POST', body: form });
-          const j = await resp.json();
-          if(!resp.ok || !j.success) throw new Error(j.msg||j.error||'update failed');
+          // Route update to appropriate endpoint depending on type being edited
+          const endpoint = (editingUserType === 'konselor') ? 'update_konselor' : 'update_user';
+          const resp = await fetch(API_BASE + 'handle_admin.php?action=' + endpoint, { method:'POST', body: form, credentials: 'same-origin' });
+          let j = null; try { j = await resp.json(); } catch(e) { j = null; }
+          if (!resp.ok) {
+            const message = j?.error || j?.msg || ('update failed: ' + resp.status);
+            alert('Server error: ' + message);
+            console.debug('update response', { status: resp.status, body: j });
+            return;
+          }
+          if(!j.success) { alert('Update failed: ' + (j.error||JSON.stringify(j))); return; }
         }
 
         await tryFetchServerData();
@@ -410,21 +493,37 @@ $admin = $_SESSION['user'];
       }catch(err){
         // fallback local
         if(modalMode === 'create'){
-          const id = Math.floor(Math.random()*1000)+300; localUsers.push({id,name,email,role,status:'active'}); renderUsers();
+          const id = Math.floor(Math.random()*1000)+300; const t = (role === 'konselor') ? 'konselor' : 'user';
+          if (t === 'konselor') {
+            localKonselors.push({id,name,email,role,type:t,status:'active'});
+          } else {
+            localUsers.push({id,name,email,role,type:t,status:'active'});
+          }
+          renderUsers();
         } else {
-          const u = localUsers.find(x=>x.id===editingUserId); if(u){ u.name=name; u.email=email; u.role=role; renderUsers(); }
+          if (editingUserType === 'konselor') {
+            const u = localKonselors.find(x => x.id === editingUserId);
+            if (u) { u.name = name; u.email = email; u.role = role; renderUsers(); }
+          } else {
+            const u = localUsers.find(x => x.id===editingUserId && ((x.type)||(x.role==='konselor'?'konselor':'user')) === editingUserType);
+            if(u){ u.name=name; u.email=email; u.role=role; renderUsers(); }
+          }
         }
         closeUserModal();
         alert('Server unreachable. Data disimpan secara lokal sebagai fallback.');
       }
     });
 
-    // event delegation for edit/delete
-    tbody.addEventListener('click', async (e) => {
+    // event delegation for edit/delete — attach to both users and konselors tables
+    const usersTbodyEl = document.getElementById('usersTbody');
+    const konselorsTbodyEl = document.getElementById('konselorsTbody');
+
+    function handleRowClick(e) {
       // DELETE
       if (e.target.classList.contains('btnDel')) {
           const tr = e.target.closest('tr');
-          const id = parseInt(tr.children[0].textContent);
+          const id = parseInt(tr.dataset.id || tr.children[0].textContent);
+          const type = tr.dataset.type || 'user';
 
           confirmBackdrop.classList.add('active');
           const confirmOk = document.getElementById('confirmOk');
@@ -434,22 +533,33 @@ $admin = $_SESSION['user'];
               try {
                   const form = new FormData();
                   form.append('id', id);
-                  const resp = await fetch(API_BASE + 'handle_admin.php?action=delete_user', {
+                  const action = (type === 'konselor') ? 'delete_konselor' : 'delete_user';
+                    const resp = await fetch(API_BASE + 'handle_admin.php?action=' + action, {
                       method: 'POST',
-                      body: form
-                  });
-                  const j = await resp.json();
-                  if (!resp.ok || !j.success) throw new Error(j.msg || j.error || 'delete failed');
+                      body: form,
+                      credentials: 'same-origin'
+                    });
+                    const j = await resp.json();
+                    if (!resp.ok) {
+                      const message = j?.error || j?.msg || ('delete failed: ' + resp.status);
+                      alert('Server error: ' + message);
+                      console.debug('delete response', { status: resp.status, body: j });
+                      return;
+                    }
+                    if (!j.success) { alert('Delete failed: ' + (j.error || JSON.stringify(j))); return; }
 
                   await tryFetchServerData();
                   alert('User dihapus');
-              } catch (err) {
-                  const idx = localUsers.findIndex(u => u.id === id);
-                  if (idx >= 0) {
-                      localUsers.splice(idx, 1);
-                      renderUsers();
+                } catch (err) {
+                  // fallback: remove locally from the correct array
+                  if (type === 'konselor') {
+                    const kidx = localKonselors.findIndex(u => u.id === id);
+                    if (kidx >= 0) { localKonselors.splice(kidx, 1); renderUsers(); }
+                  } else {
+                    const idx = localUsers.findIndex(u => u.id === id);
+                    if (idx >= 0) { localUsers.splice(idx, 1); renderUsers(); }
                   }
-                  alert('Server unreachable — user dihapus lokal.');
+                  alert('Server unreachable — data dihapus lokal.');
               } finally {
                   confirmBackdrop.classList.remove('active');
                   confirmOk.removeEventListener('click', onOk);
@@ -465,26 +575,90 @@ $admin = $_SESSION['user'];
           confirmCancel.addEventListener('click', onCancel, { once: true });
       }
 
-      // EDIT
-      if (e.target.classList.contains('btnEdit')) {
+        // EDIT
+        if (e.target.classList.contains('btnEdit')) {
           const tr = e.target.closest('tr');
-          const id = parseInt(tr.children[0].textContent);
-          const u = localUsers.find(x => x.id === id);
+          const id = parseInt(tr.dataset.id || tr.children[0].textContent);
+          const type = tr.dataset.type || 'user';
+          let u = null;
+          if (type === 'konselor') {
+            u = localKonselors.find(x => x.id === id);
+          } else {
+            u = localUsers.find(x => x.id === id && ((x.type || (x.role === 'konselor' ? 'konselor' : 'user')) === type));
+          }
           if (!u) return;
-
           openUserModal('edit', u);
-      }
-    });
+        }
+    }
 
-    // sample logs (for monitoring overview)
-    const logs = [
-      {ts:'2025-12-01 09:02', text:'Admin login oleh admin@site.local'},
-      {ts:'2025-12-01 09:10', text:'User 102 mendaftar'},
-      {ts:'2025-12-01 09:13', text:'Sesi baru dimulai: session_203'},
-      {ts:'2025-12-01 10:02', text:'Backup DB otomatis selesai'},
-    ];
-    const logList = document.getElementById('logList');
-    logList.innerHTML = logs.map(l=>`<li class="p-2 border rounded-lg"> <div class="text-xs text-gray-500">${l.ts}</div> <div class="text-sm">${l.text}</div> </li>`).join('');
+    if (usersTbodyEl) usersTbodyEl.addEventListener('click', handleRowClick);
+    if (konselorsTbodyEl) konselorsTbodyEl.addEventListener('click', handleRowClick);
+
+    // fetch server logs (admin-only) and render
+    async function fetchLogs(){
+      try{
+        const resp = await fetch(API_BASE + 'handle_admin.php?action=get_logs');
+        if(!resp.ok) throw new Error('get_logs ' + resp.status);
+        const j = await resp.json();
+        if(!j.logs) throw new Error('no logs');
+        const logList = document.getElementById('logList');
+        logList.innerHTML = j.logs.map(l => {
+          let details = '';
+          try{ details = typeof l.details === 'string' ? JSON.parse(l.details) : l.details; }catch(e){ details = l.details || ''; }
+          // human friendly message
+          let actorLabel = l.actor_type ? (l.actor_type.charAt(0).toUpperCase() + l.actor_type.slice(1)) : 'Actor';
+          let message = '';
+          switch(l.action){
+            case 'create_user':
+              message = `${actorLabel} #${l.actor_id} menambahkan user ${details.email ?? 'unknown'} (id:${details.user_id ?? '?'})`;
+              break;
+            case 'update_user':
+                  // details.updated may be an object mapping fields->new values
+                  if (details && typeof details.updated === 'object' && !Array.isArray(details.updated)) {
+                    const pairs = Object.entries(details.updated).map(([k,v]) => `${k}:${v}`);
+                    message = `${actorLabel} #${l.actor_id} memperbarui user id:${details.user_id ?? '?'} (${pairs.join(', ')})`;
+                  } else {
+                    message = `${actorLabel} #${l.actor_id} memperbarui user id:${details.user_id ?? '?'} (${Array.isArray(details.updated)?details.updated.join(', '):details.updated})`;
+                  }
+              break;
+                case 'create_konselor':
+                  message = `${actorLabel} #${l.actor_id} menambahkan konselor ${details.email ?? 'unknown'} (id:${details.konselor_id ?? '?'})`;
+                  break;
+                case 'update_konselor':
+                  if (details && typeof details.updated === 'object' && !Array.isArray(details.updated)) {
+                    const pairs = Object.entries(details.updated).map(([k,v]) => `${k}:${v}`);
+                    message = `${actorLabel} #${l.actor_id} memperbarui konselor id:${details.konselor_id ?? '?'} (${pairs.join(', ')})`;
+                  } else {
+                    message = `${actorLabel} #${l.actor_id} memperbarui konselor id:${details.konselor_id ?? '?'} (${details.updated})`;
+                  }
+                  break;
+                case 'delete_konselor':
+                  message = `${actorLabel} #${l.actor_id} menghapus konselor id:${details.konselor_id ?? '?'}`;
+                  break;
+            case 'delete_user':
+              message = `${actorLabel} #${l.actor_id} menghapus user id:${details.user_id ?? '?'}`;
+              break;
+            case 'login':
+              message = `${actorLabel} #${l.actor_id} berhasil login` + ((details && details.email) ? ` (${details.email})` : '');
+              break;
+            case 'register':
+              message = `User #${l.actor_id} terdaftar` + ((details && details.email) ? ` (${details.email})` : '');
+              break;
+            default:
+              message = `${actorLabel} #${l.actor_id} — ${l.action}`;
+          }
+          return `<li class="p-2 border rounded-lg"> <div class="text-xs text-gray-500">${l.created_at}</div> <div class="text-sm">${message}</div> </li>`;
+        }).join('');
+      }catch(e){
+        // fallback message
+        const logList = document.getElementById('logList');
+        logList.innerHTML = `<li class="p-2 text-xs text-gray-500">Tidak dapat memuat log: ${e.message}</li>`;
+      }
+    }
+
+    fetchLogs();
+    // refresh logs occasionally
+    setInterval(fetchLogs, 8000);
 
     // ensure admin sidebar is on top and menu items show pointer
     (function(){
@@ -492,6 +666,8 @@ $admin = $_SESSION['user'];
       if(sidebarEl) sidebarEl.style.zIndex = 40;
       document.querySelectorAll('#adminSidebar .menu-item').forEach(b=>b.style.cursor='pointer');
     })();
+
+    // removed legacy Check API button handler: ping is no longer exposed through the header
 
     // Simple canvas chart helpers for live monitoring visuals
     function createChart(canvas, color){

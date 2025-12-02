@@ -271,12 +271,20 @@ if (isset($_GET['p'])) {
 <!-- TESTIMONIAL AUTO-SCROLL -->
 <script>
 const viewport = document.getElementById('testimonialViewport');
-setInterval(() => {
-   viewport.scrollBy({ left: 330, behavior:'smooth' });
-   if (viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 10) {
-       viewport.scrollTo({ left:0, behavior:'smooth' });
-   }
-}, 4000);
+// Only run auto-scroll if the viewport element is present on the page
+if (viewport) {
+    setInterval(() => {
+        // guard methods too — defensive to avoid page-wide runtime errors
+        if (typeof viewport.scrollBy === 'function') {
+            viewport.scrollBy({ left: 330, behavior:'smooth' });
+        }
+        if (typeof viewport.scrollLeft === 'number' && typeof viewport.clientWidth === 'number' && typeof viewport.scrollWidth === 'number') {
+            if (viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 10) {
+                if (typeof viewport.scrollTo === 'function') viewport.scrollTo({ left:0, behavior:'smooth' });
+            }
+        }
+    }, 4000);
+}
 </script>
 
 </body>

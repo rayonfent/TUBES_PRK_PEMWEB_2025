@@ -52,6 +52,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $insert->bind_param("ssss", $name, $email, $hashed, $profile_picture);
 
             if ($insert->execute()) {
+                // write activity log: new user registration (best-effort)
+                try{
+                    $newId = $insert->insert_id;
+                    $stmtLog = $conn->prepare("INSERT INTO activity_log (actor_type, actor_id, action, details) VALUES (?,?,?,?)");
+                    if ($stmtLog) {
+                        $actorType = 'user';
+                        $actorId = intval($newId);
+                        $action = 'register';
+                        $details = json_encode(['email' => $email]);
+                        $stmtLog->bind_param('siss', $actorType, $actorId, $action, $details);
+                        $stmtLog->execute();
+                        $stmtLog->close();
+                    }
+                } catch(Exception $e){ /* ignore logging failure */ }
                 $reg_success = "Akun berhasil dibuat! Mengarahkan ke survey...";
                 echo "<script>
                     setTimeout(()=>{ window.location='index.php?p=survey'; }, 1500);

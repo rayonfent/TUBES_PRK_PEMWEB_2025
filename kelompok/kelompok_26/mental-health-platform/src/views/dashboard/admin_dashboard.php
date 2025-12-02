@@ -569,3 +569,5 @@ $admin = $_SESSION['user'];
   .form-row input, .form-row select, textarea{ width:100%; padding:10px;border-radius:8px;border:1px solid #E6EDF3 }
   .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px }
 </style>
+
+/* tes */

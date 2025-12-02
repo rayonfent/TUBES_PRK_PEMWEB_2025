@@ -69,7 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <h2 class="text-3xl font-bold text-center text-[#17252A]">Masuk ke Astral Psychologist</h2>
         <p class="text-center text-gray-500 mt-2 text-sm">Selamat datang kembali.</p>
 
-        <!-- ERROR box langsung di halaman yang sama -->
         <?php if (!empty($login_error)): ?>
             <div class="mt-6 mb-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm animate-fade">
                 <?= $login_error ?>

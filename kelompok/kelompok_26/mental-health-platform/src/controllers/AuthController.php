@@ -45,6 +45,22 @@ class AuthController {
                 unset($user['password']);
                 $_SESSION['user'] = $user;
 
+                // record activity log (best-effort)
+                try {
+                    $actorType = ($user['role'] === 'admin') ? 'admin' : 'user';
+                    $actorId = intval($user['user_id'] ?? $user['id'] ?? 0);
+                    $details = json_encode(['email' => $email]);
+                    $stmtLog = $this->db->prepare("INSERT INTO activity_log (actor_type, actor_id, action, details) VALUES (?,?,?,?)");
+                    if ($stmtLog) {
+                        $action = 'login';
+                        $stmtLog->bind_param('siss', $actorType, $actorId, $action, $details);
+                        $stmtLog->execute();
+                        $stmtLog->close();
+                    }
+                } catch (Exception $e) {
+                    // ignore logging errors
+                }
+
                 // route berdasarkan role
                 if ($user['role'] === 'admin') {
                     header("Location: ?p=admin_dashboard");
@@ -67,6 +83,21 @@ class AuthController {
             if (password_verify($password, $k['password'])) {
                 unset($k['password']);
                 $_SESSION['konselor'] = $k;
+                // record konselor login
+                try {
+                    $actorType = 'konselor';
+                    $actorId = intval($k['konselor_id'] ?? $k['id'] ?? 0);
+                    $details = json_encode(['email' => $email]);
+                    $stmtLog = $this->db->prepare("INSERT INTO activity_log (actor_type, actor_id, action, details) VALUES (?,?,?,?)");
+                    if ($stmtLog) {
+                        $action = 'login';
+                        $stmtLog->bind_param('siss', $actorType, $actorId, $action, $details);
+                        $stmtLog->execute();
+                        $stmtLog->close();
+                    }
+                } catch (Exception $e) {
+                    // ignore logging problems
+                }
                 header("Location: ?p=konselor_dashboard");
                 exit;
             }

@@ -1,12 +1,12 @@
 <?php
 // views/survey/survey_form.php
+// session_start() already called in index.php
 require_once dirname(__DIR__, 2) . "/config/database.php";
 
 $survey_error = "";
 
 // Jika form disubmit
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
     if (!isset($_SESSION['user'])) {
         echo "<script>window.location='index.php?p=login';</script>";
         exit;
@@ -23,14 +23,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (!$q1 || !$q2 || !$q3 || !$q4) {
         $survey_error = "Mohon jawab semua pertanyaan.";
     } else {
-
         $stmt = $conn->prepare("
             INSERT INTO user_survey (user_id, q1, q2, q3, q4)
             VALUES (?, ?, ?, ?, ?)
         ");
-
         $stmt->bind_param("iiiii", $user_id, $q1, $q2, $q3, $q4);
-
         if ($stmt->execute()) {
             echo "<script>window.location='index.php?p=match';</script>";
             exit;

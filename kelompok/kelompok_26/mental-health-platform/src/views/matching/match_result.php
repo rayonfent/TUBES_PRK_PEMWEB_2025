@@ -116,35 +116,43 @@ usort($results, function($a, $b) {
 
             <div class="grid md:grid-cols-2 gap-6">
 
-                <!-- Communication Style Bar -->
+                <!-- Communication Style Bar with Gradient -->
                 <div>
                     <div class="font-semibold mb-2">Gaya Komunikasi</div>
-                    <div class="text-sm text-gray-500 mb-2"><?= $comm_label ?></div>
+                    <div class="text-sm text-gray-500 mb-3"><?= $comm_label ?></div>
 
-                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                        <div class="h-full bg-[#3AAFA9] rounded-full"
-                             style="width: <?= ($direct_score / 3) * 100 ?>%"></div>
+                    <div class="relative w-full h-8 rounded-full overflow-visible" style="background: linear-gradient(to right, #3498DB, #E74C3C); box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                        <?php 
+                            $commPosition = ($direct_score / 3) * 100;
+                            // Batasi posisi agar bola tidak keluar
+                            $clampedCommPos = max(3, min(97, $commPosition));
+                        ?>
+                        <div class="absolute top-1/2 transform -translate-y-1/2 w-5 h-5 bg-white border-2 border-gray-400 rounded-full shadow-md" style="left: <?= $clampedCommPos ?>%; margin-left: -10px;"></div>
                     </div>
 
-                    <div class="flex justify-between text-xs mt-1 text-gray-500">
-                        <span>Tegas</span>
-                        <span>Lembut</span>
+                    <div class="flex justify-between text-xs mt-3 text-gray-600 font-medium">
+                        <span>🔵 Lembut</span>
+                        <span>🔴 Tegas</span>
                     </div>
                 </div>
 
-                <!-- Emotional Thinking Bar -->
+                <!-- Emotional Thinking Bar with Gradient -->
                 <div>
                     <div class="font-semibold mb-2">Pendekatan Emosional</div>
-                    <div class="text-sm text-gray-500 mb-2"><?= $emo_label ?></div>
+                    <div class="text-sm text-gray-500 mb-3"><?= $emo_label ?></div>
 
-                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                        <div class="h-full bg-[#17252A] rounded-full"
-                             style="width: <?= $logical ? '100%' : '0%' ?>"></div>
+                    <div class="relative w-full h-8 rounded-full overflow-visible" style="background: linear-gradient(to right, #E8A0BF, #F5D76E); box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                        <?php 
+                            $emoPosition = $logical ? 100 : 0;
+                            // Batasi posisi agar bola tidak keluar
+                            $clampedEmoPos = max(3, min(97, $emoPosition));
+                        ?>
+                        <div class="absolute top-1/2 transform -translate-y-1/2 w-5 h-5 bg-white border-2 border-gray-400 rounded-full shadow-md" style="left: <?= $clampedEmoPos ?>%; margin-left: -10px;"></div>
                     </div>
 
-                    <div class="flex justify-between text-xs mt-1 text-gray-500">
-                        <span>Logis</span>
-                        <span>Emosional</span>
+                    <div class="flex justify-between text-xs mt-3 text-gray-600 font-medium">
+                        <span>💖 Emosional</span>
+                        <span>🧠 Logis</span>
                     </div>
                 </div>
 

@@ -87,7 +87,7 @@ function load_view($path) {
 <section class="pt-28 pb-24 relative overflow-visible">
 
     <!-- BRAIN IMAGE RIGHT SIDE (MEMANJANG KE BAWAH) -->
-    <img src="https://cdn-icons-png.flaticon.com/512/4206/4206277.png"
+    <img src="X:\System\laragon\www\TUBES_PRK_PEMWEB_2025\kelompok\kelompok_26\mental-health-platform\screenshots\SplashScreenBg.jpg"
         class="brain-hero opacity-[0.27]"
         style="width:580px; object-fit:cover;">
 

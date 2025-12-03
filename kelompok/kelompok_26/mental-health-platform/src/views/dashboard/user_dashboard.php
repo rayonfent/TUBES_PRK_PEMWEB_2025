@@ -24,10 +24,10 @@ if ($res && $res->num_rows) $survey = $res->fetch_assoc();
 // === Fetch recent chat sessions (last 10) ===
 // sessions table assumed: session_id, user_id, konselor_id, status ('active','closed','trial'), started_at, ended_at
 $sessions = [];
-$stmt = $conn->prepare("SELECT s.*, k.name AS konselor_name, k.profile_picture AS konselor_pic
-    FROM sessions s
-    LEFT JOIN konselor k ON k.konselor_id = s.konselor_id
-    WHERE s.user_id = ? ORDER BY s.started_at DESC LIMIT 10");
+        $stmt = $conn->prepare("SELECT s.*, k.name AS konselor_name, k.profile_picture AS konselor_pic
+            FROM chat_session s
+            LEFT JOIN konselor k ON k.konselor_id = s.konselor_id
+            WHERE s.user_id = ? ORDER BY s.started_at DESC LIMIT 10");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -47,7 +47,7 @@ if ($res && $res->num_rows) $payment = $res->fetch_assoc();
 // === Quick stats ===
 // total sessions
 $stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM sessions WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
+    $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $total_sessions = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
 

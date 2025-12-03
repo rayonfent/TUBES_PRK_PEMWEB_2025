@@ -57,12 +57,19 @@ switch ($action) {
             'db_connections' => null
         ];
 
-        // total users (count all rows in users)
+        // total users = users + konselor
+        $totalUsers = 0;
         if ($r = $conn->query("SELECT COUNT(*) AS cnt FROM users")) {
             $row = $r->fetch_assoc();
-            $out['total_users'] = intval($row['cnt'] ?? 0);
+            $totalUsers += intval($row['cnt'] ?? 0);
             $r->free();
         }
+        if ($r = $conn->query("SELECT COUNT(*) AS cnt FROM konselor")) {
+            $row = $r->fetch_assoc();
+            $totalUsers += intval($row['cnt'] ?? 0);
+            $r->free();
+        }
+        $out['total_users'] = $totalUsers;
 
         // active sessions (chat_session.status = 'active')
         if ($r = $conn->query("SELECT COUNT(*) AS cnt FROM chat_session WHERE status = 'active'")) {

@@ -32,7 +32,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $login_error = "Email atau password salah.";
             } else {
                 // LOGIN SUKSES KONSELOR
-                session_start();
                 $_SESSION['konselor'] = $konselor;
                 echo "<script>window.location='index.php?p=konselor_dashboard';</script>";
                 exit;
@@ -44,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $login_error = "Email atau password salah.";
         } else {
             // LOGIN SUKSES
-            session_start();
             $_SESSION['user'] = $user;
             // === ROLE-BASED REDIRECT ===
             if ($user['role'] === 'admin') {

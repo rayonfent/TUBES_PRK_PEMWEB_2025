@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 01, 2025 at 02:49 PM
+-- Generation Time: Dec 03, 2025 at 02:08 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -20,6 +20,46 @@ SET time_zone = "+00:00";
 --
 -- Database: `mental_health_platform`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_log`
+--
+
+CREATE TABLE `activity_log` (
+  `id` int NOT NULL,
+  `actor_type` enum('user','admin','konselor') NOT NULL,
+  `actor_id` int NOT NULL,
+  `action` varchar(255) NOT NULL,
+  `details` text,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `activity_log`
+--
+
+INSERT INTO `activity_log` (`id`, `actor_type`, `actor_id`, `action`, `details`, `created_at`) VALUES
+(1, 'admin', 1, 'create_user', '{\"user_id\":7,\"email\":\"hendro@astral.us\",\"role\":\"user\"}', '2025-12-02 19:53:12'),
+(2, 'admin', 1, 'create_user', '{\"user_id\":8,\"email\":\"maru@astral.us\",\"role\":\"admin\"}', '2025-12-02 20:01:11'),
+(3, 'admin', 1, 'update_user', '{\"user_id\":7,\"updated\":[\"name=?\",\"email=?\",\"role=?\"]}', '2025-12-02 20:01:46'),
+(4, 'admin', 1, 'create_user', '{\"user_id\":9,\"email\":\"momo@astral.us\",\"role\":\"user\"}', '2025-12-02 21:56:43'),
+(5, 'admin', 1, 'update_user', '{\"user_id\":9,\"updated\":{\"name\":\"Momo mew\",\"email\":\"momo@astral.us\",\"role\":\"user\"}}', '2025-12-02 21:57:14'),
+(6, 'admin', 1, 'update_user', '{\"user_id\":9,\"updated\":{\"name\":\"Momo mewW\",\"email\":\"momo@astral.us\",\"role\":\"user\"}}', '2025-12-02 22:07:43'),
+(7, 'admin', 1, 'delete_user', '{\"user_id\":7}', '2025-12-02 22:07:50'),
+(8, 'admin', 1, 'create_konselor', '{\"konselor_id\":1,\"email\":\"Aw@A.C\"}', '2025-12-02 22:10:12'),
+(9, 'admin', 1, 'create_konselor', '{\"konselor_id\":2,\"email\":\"Aw@A.CS\"}', '2025-12-02 22:11:09'),
+(10, 'admin', 1, 'update_konselor', '{\"konselor_id\":1,\"updated\":{\"name\":\"A\",\"email\":\"Aw@A.C\",\"password\":\"updated\"}}', '2025-12-02 22:11:22'),
+(11, 'admin', 1, 'delete_user', '{\"user_id\":3}', '2025-12-02 22:38:18'),
+(12, 'admin', 1, 'update_konselor', '{\"konselor_id\":2,\"updated\":{\"name\":\"hENDRI\",\"email\":\"Aw@A.CSx\"}}', '2025-12-02 22:38:27'),
+(13, 'admin', 1, 'delete_konselor', '{\"konselor_id\":2}', '2025-12-02 22:38:39'),
+(14, 'admin', 1, 'delete_konselor', '{\"konselor_id\":1}', '2025-12-02 22:38:42'),
+(15, 'admin', 1, 'create_konselor', '{\"konselor_id\":3,\"email\":\"hendri@astral.us\"}', '2025-12-02 22:39:45'),
+(16, 'admin', 1, 'create_konselor', '{\"konselor_id\":4,\"email\":\"EsdeeKid@astral.us\"}', '2025-12-02 22:56:50'),
+(17, 'admin', 1, 'create_konselor', '{\"konselor_id\":5,\"email\":\"tastetec@astral.us\"}', '2025-12-02 23:02:13'),
+(18, 'admin', 1, 'update_konselor', '{\"konselor_id\":4,\"updated\":{\"name\":\"Tenxi Widjaya\",\"email\":\"j4w1r@astral.us\"}}', '2025-12-02 23:02:31'),
+(19, 'admin', 1, 'update_konselor', '{\"konselor_id\":4,\"updated\":{\"name\":\"Tenxi Widjaya\",\"email\":\"j4w1r@astral.us\",\"password\":\"updated\"}}', '2025-12-02 23:03:17');
 
 -- --------------------------------------------------------
 
@@ -109,6 +149,17 @@ CREATE TABLE `konselor` (
   `online_status` tinyint(1) DEFAULT '0',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `konselor`
+--
+
+INSERT INTO `konselor` (`konselor_id`, `name`, `email`, `password`, `bio`, `profile_picture`, `experience_years`, `rating`, `online_status`, `created_at`) VALUES
+(1, 'Hendri', 'hendri@astral.us', '$2y$10$HZzVsZaetGhGwa5.McPfqO6kZfEyDzkSeJUfkkEMwPnz1Rop5BEv.', NULL, NULL, 0, 0, 0, '2025-12-02 22:39:45'),
+(2, 'EsdeeKid', 'EsdeeKid@astral.us', '$2y$10$.LTEpEW8RbVQwOfAhp3jpO3y0WSPwnFEfcL2S0Z5NpaekV8ftxpw2', NULL, NULL, 0, 0, 0, '2025-12-02 22:56:50'),
+(3, 'Carti', 'pboycarti@astral.us', 'konselor', 'schyeahh', NULL, 5, 4.9, 0, '2025-12-02 22:59:23'),
+(4, 'Tenxi Widjaya', 'j4w1r@astral.us', '$2y$10$ep03ovedH9nDd1V73YT4gesskiN9wA.lcASwFkjnGRkh6OtlYUdba', 'Dia suka baju hitamku celana camo ku', NULL, 3, 5, 0, '2025-12-02 23:00:56'),
+(5, 'Tecca', 'tastetec@astral.us', '$2y$10$WgVsTtqnhs8tkGA.CH63UehGZ.XBsM0HO7rQjc4TUcgXuN/BBNldu', NULL, NULL, 0, 0, 0, '2025-12-02 23:02:13');
 
 -- --------------------------------------------------------
 
@@ -201,9 +252,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `profile_picture`, `role`, `created_at`) VALUES
-(1, 'admin', '2315061098@unila.ac.id', '$2y$10$j3/x/cBL9EZwp0EQ527iWOsCW1U7v1112e24cy.KdsWuah5992mKC', NULL, 'user', '2025-11-30 12:27:03'),
+(1, 'Admin Astral', 'admin@astral.us', '$2y$10$/sOLTxbDBWzQNecQPOsn5.o9gWa7U4XFUk/iLfs8.XukZA.fPcUZe', NULL, 'admin', '2025-12-01 22:59:02'),
 (2, 'zabbix', 'n@unila.ac.id', '$2y$10$dmwnAg6TCzIHhqqeLbHPEuId4C667dUtInd1tRRvilT67jtaMOM9e', NULL, 'user', '2025-11-30 12:53:32'),
-(3, 'zabbix23', '231506102398@unila.ac.id', '$2y$10$0icBkkl91.3p4PgojUr3C.MLbnZ0BTm.vXS1P8RDv/MVFIw04/FEu', NULL, 'user', '2025-12-01 15:50:04');
+(4, 'root', 'admin@unila.ac.id', 'root', NULL, 'admin', '2025-12-01 22:15:33'),
+(6, 'ray', 'ray@mail.com', '$2y$10$k.y0W7iEjPTjRjSYfQmcputVAjkVWlzjoA4dbrXuCwDb/5G6eiItu', NULL, 'user', '2025-12-01 23:11:11'),
+(8, 'Maru', 'maru@astral.us', '$2y$10$Al3fo4M/MOihY1yPS.uIqu/yqn54.Yc6x8WA3m0Fv.SgkE/Uo1dWq', NULL, 'admin', '2025-12-02 20:01:11'),
+(9, 'Momo mewW', 'momo@astral.us', '$2y$10$wTEfxNDioSk7bOSTF.6q8.fFKQ4CdouaQ6VJB1K/cwsQj11zE4lsy', NULL, 'user', '2025-12-02 21:56:43');
 
 -- --------------------------------------------------------
 
@@ -247,21 +301,14 @@ CREATE TABLE `user_survey` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data for table `user_survey`
---
-
-INSERT INTO `user_survey` (`survey_id`, `user_id`, `q1`, `q2`, `q3`, `q4`, `created_at`) VALUES
-(1, 1, 1, 1, 2, 1, '2025-11-30 12:53:57'),
-(2, 1, 1, 1, 2, 1, '2025-11-30 12:57:18'),
-(3, 1, 2, 1, 2, 1, '2025-11-30 13:05:28'),
-(4, 1, 2, 2, 2, 2, '2025-11-30 13:05:42'),
-(5, 1, 1, 1, 1, 1, '2025-11-30 13:05:57'),
-(6, 1, 2, 2, 1, 2, '2025-11-30 13:11:22'),
-(7, 1, 1, 2, 2, 2, '2025-12-01 18:13:59');
-
---
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activity_log`
+--
+ALTER TABLE `activity_log`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `admin_activity_log`
@@ -374,6 +421,12 @@ ALTER TABLE `user_survey`
 --
 
 --
+-- AUTO_INCREMENT for table `activity_log`
+--
+ALTER TABLE `activity_log`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
 -- AUTO_INCREMENT for table `admin_activity_log`
 --
 ALTER TABLE `admin_activity_log`
@@ -407,7 +460,7 @@ ALTER TABLE `issues`
 -- AUTO_INCREMENT for table `konselor`
 --
 ALTER TABLE `konselor`
-  MODIFY `konselor_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `konselor_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `konselor_profile`
@@ -437,7 +490,7 @@ ALTER TABLE `subscription`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `user_preferences`

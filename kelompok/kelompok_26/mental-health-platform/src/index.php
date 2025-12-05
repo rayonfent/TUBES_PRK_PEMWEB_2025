@@ -274,6 +274,10 @@ if (isset($_GET['p'])) {
             $userController = new UserController($conn);
             $userController->changePassword();
             break;
+        
+        case 'user_settings':
+            load_view("dashboard/user_settings");
+            break;
 
         default:
             load_view("404");

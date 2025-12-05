@@ -257,167 +257,23 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
             </a>
         </div>
 
-        <!-- PROFILE SETTINGS SECTION -->
-        <div class="bg-white rounded-2xl soft-shadow p-8 mb-10">
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-bold text-[#17252A]">⚙️ Pengaturan Profil</h2>
-                <a href="index.php?p=user_dashboard" class="text-sm text-gray-500 hover:text-[#3AAFA9]">← Kembali</a>
-            </div>
-            
-            <!-- Tab Navigation -->
-            <div class="flex flex-wrap gap-2 mb-8 border-b border-gray-200">
-                <button onclick="showTab('tab-edit')" class="tab-button active px-6 py-3 font-semibold text-[#17252A] border-b-2 border-[#3AAFA9]">
-                    👤 Edit Profil
-                </button>
-                <button onclick="showTab('tab-photo')" class="tab-button px-6 py-3 font-semibold text-gray-600 border-b-2 border-transparent hover:border-gray-300">
-                    📷 Foto Profil
-                </button>
-                <button onclick="showTab('tab-password')" class="tab-button px-6 py-3 font-semibold text-gray-600 border-b-2 border-transparent hover:border-gray-300">
-                    🔐 Ubah Password
-                </button>
-            </div>
-            
-            <!-- Tab 1: Edit Profile -->
-            <div id="tab-edit" class="tab-content">
-                <div class="max-w-md">
-                    <h3 class="text-lg font-semibold text-[#17252A] mb-6">Edit Data Profil Anda</h3>
-                    <form method="POST" action="index.php?p=update_profile" class="space-y-5">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                            <input type="text" name="name" value="<?= htmlspecialchars($user['name'] ?? $user['email']) ?>" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent" required>
-                            <p class="text-xs text-gray-500 mt-1">Nama yang akan ditampilkan di profil</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent" required>
-                            <p class="text-xs text-gray-500 mt-1">Email untuk login dan notifikasi</p>
-                        </div>
-                        <button type="submit" class="w-full px-4 py-3 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-semibold transition">
-                            💾 Simpan Perubahan
-                        </button>
-                    </form>
+        <!-- PROFILE SETTINGS BUTTON -->
+        <div class="bg-white rounded-2xl soft-shadow p-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-[#17252A]">⚙️ Pengaturan Akun</h2>
+                    <p class="text-gray-600 mt-2">Kelola profil, keamanan, dan preferensi Anda di halaman pengaturan</p>
                 </div>
-            </div>
-            
-            <!-- Tab 2: Upload Profile Picture -->
-            <div id="tab-photo" class="tab-content hidden">
-                <div class="max-w-md">
-                    <h3 class="text-lg font-semibold text-[#17252A] mb-6">Ubah Foto Profil</h3>
-                    <form method="POST" action="index.php?p=upload_profile_picture" enctype="multipart/form-data" class="space-y-5">
-                        <div class="flex justify-center mb-6">
-                            <div class="relative">
-                                <img src="<?= isset($user['profile_picture']) && $user['profile_picture'] ? "./uploads/profile/".htmlspecialchars($user['profile_picture']) : 'https://via.placeholder.com/150x150?text=Profile' ?>" 
-                                     alt="profile" class="w-40 h-40 object-cover rounded-xl shadow-lg border-4 border-[#3AAFA9]">
-                                <div class="absolute bottom-0 right-0 bg-[#3AAFA9] text-white p-2 rounded-full">
-                                    📷
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Foto Baru</label>
-                            <div class="relative">
-                                <input type="file" name="profile_picture" accept="image/*" id="profilePictureInput"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent cursor-pointer">
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG, GIF (Max 2MB)</p>
-                        </div>
-                        <button type="submit" class="w-full px-4 py-3 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-semibold transition">
-                            📤 Upload Foto
-                        </button>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Tab 3: Change Password -->
-            <div id="tab-password" class="tab-content hidden">
-                <div class="max-w-md">
-                    <h3 class="text-lg font-semibold text-[#17252A] mb-6">Ubah Password</h3>
-                    <form method="POST" action="index.php?p=change_password" class="space-y-5">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Password Saat Ini</label>
-                            <input type="password" name="old_password" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent" required>
-                            <p class="text-xs text-gray-500 mt-1">Masukkan password yang Anda gunakan sekarang</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
-                            <input type="password" name="new_password" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent" required>
-                            <p class="text-xs text-gray-500 mt-1">Minimal 6 karakter, gunakan kombinasi huruf dan angka</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Baru</label>
-                            <input type="password" name="confirm_password" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3AAFA9] focus:border-transparent" required>
-                            <p class="text-xs text-gray-500 mt-1">Ketik ulang password baru Anda</p>
-                        </div>
-                        <button type="submit" class="w-full px-4 py-3 bg-[#17252A] text-white rounded-lg hover:bg-[#0F1920] font-semibold transition">
-                            🔐 Update Password
-                        </button>
-                    </form>
-                </div>
+                <a href="index.php?p=user_settings" class="inline-flex items-center px-8 py-4 bg-[#3AAFA9] text-white rounded-lg font-bold hover:bg-[#2B8E89] transition shadow-lg">
+                    Ke Pengaturan →
+                </a>
             </div>
         </div>
 
     </div>
 </div>
 
+
 <style>
 .soft-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-
-.tab-content {
-    display: block;
-    animation: fadeIn 0.3s ease-in;
-}
-
-.tab-content.hidden {
-    display: none;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.tab-button {
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.tab-button:hover {
-    color: #3AAFA9;
-}
 </style>
-
-<script>
-function showTab(tabId) {
-    // Hide all tabs
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.add('hidden'));
-    
-    // Remove active state from all buttons
-    const buttons = document.querySelectorAll('.tab-button');
-    buttons.forEach(btn => {
-        btn.classList.remove('border-[#3AAFA9]', 'text-[#17252A]');
-        btn.classList.add('border-transparent', 'text-gray-600');
-    });
-    
-    // Show selected tab
-    const selectedTab = document.getElementById(tabId);
-    if (selectedTab) {
-        selectedTab.classList.remove('hidden');
-    }
-    
-    // Set active state for clicked button
-    event.target.classList.remove('border-transparent', 'text-gray-600');
-    event.target.classList.add('border-[#3AAFA9]', 'text-[#17252A]', 'font-semibold');
-}
-</script>

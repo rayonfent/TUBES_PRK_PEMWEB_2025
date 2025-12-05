@@ -4,6 +4,7 @@
 
 // Pastikan koneksi database tersedia
 require_once dirname(__DIR__, 2) . "/config/database.php";
+require_once dirname(__DIR__, 2) . "/models/User.php";
 
 if (!isset($_SESSION['user'])) {
     echo "<script>window.location='index.php?p=login';</script>";
@@ -13,49 +14,79 @@ if (!isset($_SESSION['user'])) {
 $user = $_SESSION['user'];
 $user_id = $user['user_id'] ?? $user['id'] ?? null;
 
-// === Fetch latest survey (if any) ===
+$userModel = new User($conn);
+
+// Get flash messages
+$success_msg = $_SESSION['success'] ?? null;
+$error_msg = $_SESSION['error'] ?? null;
+unset($_SESSION['success'], $_SESSION['error']);
+
+// Initialize variables
 $survey = null;
-$stmt = $conn->prepare("SELECT * FROM user_survey WHERE user_id = ? ORDER BY survey_id DESC LIMIT 1");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$res = $stmt->get_result();
-if ($res && $res->num_rows) $survey = $res->fetch_assoc();
+$payment = null;
+$sessions = [];
+$total_sessions = 0;
+
+// === Fetch latest survey (if any) ===
+$tableCheckResult = $conn->query("SHOW TABLES LIKE 'user_survey'");
+if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
+    $stmt = $conn->prepare("SELECT * FROM user_survey WHERE user_id = ? ORDER BY survey_id DESC LIMIT 1");
+    if ($stmt) {
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res && $res->num_rows) $survey = $res->fetch_assoc();
+    }
+}
 
 // === Fetch recent chat sessions (last 10) ===
 // sessions table assumed: session_id, user_id, konselor_id, status ('active','closed','trial'), started_at, ended_at
-$sessions = [];
-        $stmt = $conn->prepare("SELECT s.*, k.name AS konselor_name, k.profile_picture AS konselor_pic
-            FROM chat_session s
-            LEFT JOIN konselor k ON k.konselor_id = s.konselor_id
-            WHERE s.user_id = ? ORDER BY s.started_at DESC LIMIT 10");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$res = $stmt->get_result();
-if ($res) {
-    while ($row = $res->fetch_assoc()) $sessions[] = $row;
+$tableCheckResult = $conn->query("SHOW TABLES LIKE 'chat_session'");
+if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
+    $stmt = $conn->prepare("SELECT s.*, k.name AS konselor_name, k.profile_picture AS konselor_pic
+        FROM chat_session s
+        LEFT JOIN konselor k ON k.konselor_id = s.konselor_id
+        WHERE s.user_id = ? ORDER BY s.started_at DESC LIMIT 10");
+    if ($stmt) {
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res) {
+            while ($row = $res->fetch_assoc()) $sessions[] = $row;
+        }
+    }
 }
-
-// === Fetch subscription/payment status (simple) ===
-// payments table assumed: payment_id, user_id, status ('paid','due','trial'), plan, expires_at
-$payment = null;
-$stmt = $conn->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_id DESC LIMIT 1");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$res = $stmt->get_result();
-if ($res && $res->num_rows) $payment = $res->fetch_assoc();
 
 // === Quick stats ===
 // total sessions
-$stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM sessions WHERE user_id = ?");
-    $stmt->bind_param("i", $user_id);
-$stmt->execute();
-$total_sessions = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
+$tableCheckResult = $conn->query("SHOW TABLES LIKE 'chat_session'");
+if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
+    $stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM chat_session WHERE user_id = ?");
+    if ($stmt) {
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $total_sessions = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
+    }
+}
 
 // average rating given? (if there is a table user_ratings) — optional, skip if not exist
 ?>
 <div class="min-h-screen px-6 py-20 bg-gradient-to-br from-[#F2FBFA] to-[#FEFFFF]">
 
     <div class="max-w-6xl mx-auto">
+        
+        <!-- Success/Error Messages -->
+        <?php if ($success_msg): ?>
+            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                ✓ <?= htmlspecialchars($success_msg) ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($error_msg): ?>
+            <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                ✗ <?= htmlspecialchars($error_msg) ?>
+            </div>
+        <?php endif; ?>
 
         <!-- Header -->
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
@@ -209,7 +240,7 @@ $total_sessions = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
         </div>
 
         <!-- QUICK ACTIONS -->
-        <div class="grid md:grid-cols-3 gap-6">
+        <div class="grid md:grid-cols-3 gap-6 mb-10">
             <a href="index.php?p=match" class="block p-6 bg-white rounded-xl soft-shadow text-center hover:shadow-md">
                 <div class="font-semibold text-[#17252A]">Temukan Konselor</div>
                 <div class="text-sm text-gray-500 mt-2">Mulai sesi trial 1 hari</div>
@@ -224,6 +255,80 @@ $total_sessions = $stmt->get_result()->fetch_assoc()['cnt'] ?? 0;
                 <div class="font-semibold text-[#17252A]">Pembayaran</div>
                 <div class="text-sm text-gray-500 mt-2">Atur langganan & metode pembayaran</div>
             </a>
+        </div>
+
+        <!-- PROFILE SETTINGS SECTION -->
+        <div class="bg-white rounded-2xl soft-shadow p-8 mb-10">
+            <h2 class="text-2xl font-bold text-[#17252A] mb-6">⚙️ Pengaturan Profil</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Edit Profile -->
+                <div>
+                    <h3 class="text-lg font-semibold text-[#17252A] mb-4">Edit Profil</h3>
+                    <form method="POST" action="index.php?p=update_profile" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                            <input type="text" name="name" value="<?= htmlspecialchars($user['name'] ?? $user['email']) ?>" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#3AAFA9]" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#3AAFA9]" required>
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-semibold">
+                            💾 Simpan Perubahan
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Upload Profile Picture -->
+                <div>
+                    <h3 class="text-lg font-semibold text-[#17252A] mb-4">Foto Profil</h3>
+                    <form method="POST" action="index.php?p=upload_profile_picture" enctype="multipart/form-data" class="space-y-4">
+                        <div class="flex justify-center mb-4">
+                            <img src="<?= isset($user['profile_picture']) && $user['profile_picture'] ? "./uploads/profile/".htmlspecialchars($user['profile_picture']) : 'https://via.placeholder.com/120x120?text=Profile' ?>" 
+                                 alt="profile" class="w-32 h-32 object-cover rounded-lg shadow-md">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Foto</label>
+                            <input type="file" name="profile_picture" accept="image/*" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#3AAFA9]">
+                            <p class="text-xs text-gray-500 mt-2">JPG, PNG, GIF (Max 2MB)</p>
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-semibold">
+                            📷 Upload Foto
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <hr class="my-8">
+            
+            <!-- Change Password -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-[#17252A] mb-4">🔐 Ubah Password</h3>
+                <form method="POST" action="index.php?p=change_password" class="space-y-4 max-w-md">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password Lama</label>
+                        <input type="password" name="old_password" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#3AAFA9]" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
+                        <input type="password" name="new_password" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#3AAFA9]" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Baru</label>
+                        <input type="password" name="confirm_password" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#3AAFA9]" required>
+                    </div>
+                    <button type="submit" class="px-6 py-2 bg-[#17252A] text-white rounded-lg hover:bg-[#0F1920] font-semibold">
+                        Ubah Password
+                    </button>
+                </form>
+            </div>
         </div>
 
     </div>

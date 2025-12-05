@@ -82,12 +82,12 @@ while ($row = $cons->fetch_assoc()) {
     $score = 0;
 
     // Compare q1 & q2 to communication_style
-    if ($survey['q1'] == $row['communication_style']) $score++;
-    if ($survey['q2'] == $row['communication_style']) $score++;
+    if (($survey['q1'] ?? null) == ($row['communication_style'] ?? null)) $score++;
+    if (($survey['q2'] ?? null) == ($row['communication_style'] ?? null)) $score++;
 
     // Compare q3 & q4 to approach_style
-    if ($survey['q3'] == $row['approach_style']) $score++;
-    if ($survey['q4'] == $row['approach_style']) $score++;
+    if (($survey['q3'] ?? null) == ($row['approach_style'] ?? null)) $score++;
+    if (($survey['q4'] ?? null) == ($row['approach_style'] ?? null)) $score++;
 
     $row['score'] = $score;
     $results[] = $row;
@@ -102,6 +102,13 @@ usort($results, function($a, $b) {
 <div class="min-h-screen px-6 py-20 bg-gradient-to-br from-[#F2FBFA] to-[#FEFFFF]">
 
     <div class="max-w-5xl mx-auto">
+        
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="index.php?p=user_dashboard" class="inline-flex items-center text-[#3AAFA9] hover:text-[#2B8E89] font-semibold">
+                ← Kembali ke Dashboard
+            </a>
+        </div>
 
         <h2 class="text-4xl font-bold text-[#17252A] mb-4">Hasil Analisa & Kecocokan</h2>
 
@@ -191,7 +198,7 @@ usort($results, function($a, $b) {
                     <div class="mt-4 p-4 bg-[#F7FBFB] rounded-xl">
                         <p class="text-sm text-gray-600 mb-1">Gaya komunikasi konselor:</p>
 
-                        <?php if ($r['communication_style'] == 1): ?>
+                        <?php if (($r['communication_style'] ?? null) == 1): ?>
                             <div class="font-semibold text-[#17252A]">Straightforward & Direct</div>
                         <?php else: ?>
                             <div class="font-semibold text-[#17252A]">Gentle & Empathic</div>
@@ -199,7 +206,7 @@ usort($results, function($a, $b) {
 
                         <p class="text-sm text-gray-600 mt-3 mb-1">Pendekatan emosional:</p>
 
-                        <?php if ($r['approach_style'] == 1): ?>
+                        <?php if (($r['approach_style'] ?? null) == 1): ?>
                             <div class="font-semibold text-[#17252A]">Logis, rasional</div>
                         <?php else: ?>
                             <div class="font-semibold text-[#17252A]">Hangat & suportif</div>
@@ -226,6 +233,13 @@ usort($results, function($a, $b) {
 
         <?php endforeach; ?>
 
+        </div>
+        
+        <!-- Back to Dashboard Button -->
+        <div class="mt-12 text-center pb-8">
+            <a href="index.php?p=user_dashboard" class="inline-block px-8 py-3 bg-[#17252A] text-white rounded-lg hover:bg-[#0F1920] font-semibold transition">
+                ← Kembali ke Dashboard
+            </a>
         </div>
     </div>
 </div>

@@ -256,6 +256,24 @@ if (isset($_GET['p'])) {
         case 'match':
             load_view("matching/match_result");
             break;
+        
+        case 'update_profile':
+            require_once __DIR__ . '/controllers/UserController.php';
+            $userController = new UserController($conn);
+            $userController->updateProfile();
+            break;
+        
+        case 'upload_profile_picture':
+            require_once __DIR__ . '/controllers/UserController.php';
+            $userController = new UserController($conn);
+            $userController->uploadProfilePicture();
+            break;
+        
+        case 'change_password':
+            require_once __DIR__ . '/controllers/UserController.php';
+            $userController = new UserController($conn);
+            $userController->changePassword();
+            break;
 
         default:
             load_view("404");

@@ -4,7 +4,9 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/User.php';
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class UserController {
     protected $db;
@@ -21,7 +23,7 @@ class UserController {
     public function updateProfile() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['error'] = 'Invalid request method';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
@@ -38,13 +40,13 @@ class UserController {
         // Validate input
         if (empty($name) || empty($email)) {
             $_SESSION['error'] = 'Nama dan email harus diisi';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['error'] = 'Format email tidak valid';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
@@ -52,7 +54,7 @@ class UserController {
         $existingUser = $this->userModel->getUserByEmail($email);
         if ($existingUser && $existingUser['user_id'] != $userId) {
             $_SESSION['error'] = 'Email sudah digunakan oleh user lain';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
@@ -73,7 +75,7 @@ class UserController {
             $_SESSION['error'] = $result['message'];
         }
         
-        header('Location: ?p=user_dashboard');
+        header('Location: ?p=user_settings');
         exit;
     }
     
@@ -95,12 +97,19 @@ class UserController {
         
         if (!isset($_FILES['profile_picture'])) {
             $_SESSION['error'] = 'File tidak dipilih';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
         $file = $_FILES['profile_picture'];
         $userId = $_SESSION['user']['user_id'];
+        
+        // Validate file existence and upload
+        if (empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            $_SESSION['error'] = 'File tidak dipilih atau terjadi kesalahan upload';
+            header('Location: ?p=user_settings');
+            exit;
+        }
         
         // Validate file
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -108,14 +117,14 @@ class UserController {
         
         if ($file['size'] > $maxSize) {
             $_SESSION['error'] = 'Ukuran file terlalu besar (max 2MB)';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
         $fileType = mime_content_type($file['tmp_name']);
         if (!in_array($fileType, $allowedTypes)) {
             $_SESSION['error'] = 'Tipe file tidak diperbolehkan. Gunakan JPG, PNG, atau GIF';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
@@ -151,7 +160,7 @@ class UserController {
             $_SESSION['error'] = 'Gagal mengupload file';
         }
         
-        header('Location: ?p=user_dashboard');
+        header('Location: ?p=user_settings');
         exit;
     }
     
@@ -161,7 +170,7 @@ class UserController {
     public function changePassword() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['error'] = 'Invalid request method';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
@@ -179,19 +188,19 @@ class UserController {
         // Validate input
         if (empty($oldPassword) || empty($newPassword) || empty($confirmPassword)) {
             $_SESSION['error'] = 'Semua field password harus diisi';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
         if ($newPassword !== $confirmPassword) {
             $_SESSION['error'] = 'Password baru tidak sesuai dengan konfirmasi';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
         if (strlen($newPassword) < 6) {
             $_SESSION['error'] = 'Password harus minimal 6 karakter';
-            header('Location: ?p=user_dashboard');
+            header('Location: ?p=user_settings');
             exit;
         }
         
@@ -209,7 +218,7 @@ class UserController {
             $_SESSION['error'] = $result['message'];
         }
         
-        header('Location: ?p=user_dashboard');
+        header('Location: ?p=user_settings');
         exit;
     }
 }

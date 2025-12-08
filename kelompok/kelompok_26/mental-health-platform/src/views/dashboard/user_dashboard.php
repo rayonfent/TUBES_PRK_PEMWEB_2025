@@ -380,16 +380,7 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
             </a>
         </div>
 
-        <!-- PROFILE SETTINGS BUTTON -->
-        <div class="card-gradient rounded-2xl soft-shadow p-8 card-animate" style="animation-delay: 0.7s; background: linear-gradient(135deg, rgba(58, 175, 169, 0.08) 0%, rgba(222, 242, 241, 0.1) 100%); border: 1px solid rgba(58, 175, 169, 0.15);">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-[#17252A]">⚙️ Pengaturan Akun</h2>
-                    <p class="text-gray-600 mt-2">Kelola profil, keamanan, dan preferensi Anda di halaman pengaturan</p>
-                </div>
-                <a href="index.php?p=user_settings" class="inline-flex items-center px-8 py-4 bg-[#3AAFA9] text-white rounded-lg font-bold hover:bg-[#2B8E89] transition shadow-lg">
-                    Ke Pengaturan →
-                </a>
+
             </div>
         </div>
 

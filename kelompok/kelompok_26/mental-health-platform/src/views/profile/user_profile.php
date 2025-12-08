@@ -1,6 +1,6 @@
 <?php
 // src/views/profile/user_profile.php
-// User Profile Page - Astral Psychologist
+// User Profile Page - Astral Psychologist (FINALIZED FOR VERTICAL LAYOUT & CONSISTENT CARDS)
 
 require_once dirname(__DIR__, 2) . "/config/database.php";
 require_once dirname(__DIR__, 2) . "/models/User.php";
@@ -51,282 +51,273 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
     }
 }
 
-// Helper function to format activity
+// Helper functions (tetap sama)
 function formatActivity($activity) {
     $actions = [
-        'login' => '🔓 Login',
-        'update_profile' => '✏️ Update Profil',
-        'upload_profile_picture' => '📷 Upload Foto',
-        'change_password' => '🔐 Ubah Password',
-        'start_chat' => '💬 Mulai Chat',
-        'end_chat' => '🏁 Akhiri Chat',
-        'survey_completed' => '📋 Selesaikan Survey'
+        'login' => 'Login',
+        'update_profile' => 'Update Profil',
+        'upload_profile_picture' => 'Upload Foto',
+        'change_password' => 'Ubah Password',
+        'start_chat' => 'Mulai Chat',
+        'end_chat' => 'Akhiri Chat',
+        'survey_completed' => 'Selesaikan Survey'
     ];
     return $actions[$activity['action']] ?? ucfirst(str_replace('_', ' ', $activity['action']));
 }
+function getActionEmoji($activity) {
+    $actions = [
+        'login' => '🔓',
+        'update_profile' => '✏️',
+        'upload_profile_picture' => '📷',
+        'change_password' => '🔐',
+        'start_chat' => '💬',
+        'end_chat' => '🏁',
+        'survey_completed' => '📋'
+    ];
+    return $actions[$activity['action']] ?? '📝';
+}
+
+$currentPage = 'profile'; 
+$createdAt = new DateTime($user['created_at'] ?? date('Y-m-d'));
+$now = new DateTime();
+$interval = $createdAt->diff($now);
 ?>
 
-<div class="min-h-screen px-6 py-20" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: hidden; transition: background-color 0.3s ease;">
+<div class="min-h-screen" style="background-color: #f5f5f5;">
     
-    <!-- Decorative Background Elements -->
-    <div style="position: fixed; top: -50%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(58, 175, 169, 0.1) 0%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-    <div style="position: fixed; bottom: -30%; left: -5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(23, 37, 42, 0.05) 0%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+    <div class="flex min-h-screen">
 
-    <div class="max-w-6xl mx-auto relative z-10">
-        
-        <!-- Header with Back Button -->
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h1 class="text-3xl font-bold" style="color: var(--text-primary);">👤 Profil Saya</h1>
-                <p style="color: var(--text-secondary);" class="mt-2">Lihat informasi profil dan riwayat aktivitas Anda</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="index.php?p=user_dashboard" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color);" class="inline-flex items-center px-4 py-2 hover:shadow-md rounded-lg font-semibold transition">
-                    ← Kembali ke Dashboard
-                </a>
-                <button id="theme-toggle" aria-label="Toggle theme" title="Toggle dark mode" style="background: transparent; border:1px solid var(--border-color); color:var(--text-primary); padding:8px 12px; border-radius:8px; font-weight:600;">
-                    🌙 Dark
-                </button>
-            </div>
-        </div>
-
-        <!-- Profile Header Card -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-8 mb-8">
-            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-                <!-- Profile Picture -->
-                <div class="flex-shrink-0">
-                    <img src="<?= isset($user['profile_picture']) && $user['profile_picture'] ? "../uploads/profile/".htmlspecialchars($user['profile_picture']) : 'https://via.placeholder.com/200x200?text=Profile' ?>" 
-                         alt="profile" class="w-48 h-48 object-cover rounded-2xl shadow-lg border-4 border-[#3AAFA9]">
-                </div>
-
-                <!-- Profile Info -->
-                <div class="flex-1">
-                    <h2 class="text-4xl font-bold mb-2" style="color: var(--text-primary);"><?= htmlspecialchars($user['name'] ?? $user['email']) ?></h2>
-                    <p class="text-lg mb-6" style="color: var(--text-secondary);">📧 <?= htmlspecialchars($user['email']) ?></p>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div class="p-4 bg-[#F7FBFB] rounded-lg text-center">
-                            <p class="text-3xl font-bold text-[#3AAFA9]"><?= intval($total_sessions) ?></p>
-                            <p class="text-sm text-gray-600 mt-1">Total Sesi</p>
-                        </div>
-                        <div class="p-4 bg-[#F7FBFB] rounded-lg text-center">
-                            <p class="text-3xl font-bold text-[#17252A]">⭐</p>
-                            <p class="text-sm text-gray-600 mt-1">Member Aktif</p>
-                        </div>
-                        <div class="p-4 bg-[#F7FBFB] rounded-lg text-center">
-                            <p class="text-3xl font-bold text-[#3AAFA9]"><?= count($activities) ?></p>
-                            <p class="text-sm text-gray-600 mt-1">Aktivitas</p>
-                        </div>
-                        <div class="p-4 bg-[#F7FBFB] rounded-lg text-center">
-                            <p class="text-3xl font-bold text-[#17252A]">✓</p>
-                            <p class="text-sm text-gray-600 mt-1">Terverifikasi</p>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-3">
-                        <a href="index.php?p=user_settings" class="px-6 py-2 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-semibold transition">
-                            ⚙️ Pengaturan Akun
-                        </a>
-                        <a href="index.php?p=match" class="px-6 py-2 border border-[#3AAFA9] text-[#3AAFA9] rounded-lg hover:bg-[#F7FBFB] font-semibold transition">
-                            💬 Cari Konselor
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Info Sections -->
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
-
-            <!-- Account Information -->
-            <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-8">
-                <h3 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">📋 Informasi Akun</h3>
-                
-                <div class="space-y-6">
-                    <div style="border-left-color: #3AAFA9;" class="border-l-4 pl-4">
-                        <p style="color: var(--text-secondary);" class="text-sm uppercase">Email</p>
-                        <p class="text-lg font-semibold mt-1" style="color: var(--text-primary);"><?= htmlspecialchars($user['email']) ?></p>
-                    </div>
-
-                    <div style="border-left-color: #3AAFA9;" class="border-l-4 pl-4">
-                        <p style="color: var(--text-secondary);" class="text-sm uppercase">Nama Lengkap</p>
-                        <p class="text-lg font-semibold mt-1" style="color: var(--text-primary);"><?= htmlspecialchars($user['name'] ?? '-') ?></p>
-                    </div>
-
-                    <div style="border-left-color: #3AAFA9;" class="border-l-4 pl-4">
-                        <p style="color: var(--text-secondary);" class="text-sm uppercase">Role</p>
-                        <p class="text-lg font-semibold mt-1" style="color: var(--text-primary);">
-                            <?php 
-                            $role = $user['role'] ?? 'user';
-                            if ($role === 'admin') {
-                                echo '👨‍💼 Administrator';
-                            } elseif ($role === 'konselor') {
-                                echo '👨‍⚕️ Konselor';
-                            } else {
-                                echo '👤 Pengguna';
-                            }
-                            ?>
-                        </p>
-                    </div>
-
-                    <div style="border-left-color: #3AAFA9;" class="border-l-4 pl-4">
-                        <p style="color: var(--text-secondary);" class="text-sm uppercase">ID Pengguna</p>
-                        <p class="text-lg font-semibold mt-1" style="color: var(--text-primary);">#<?= htmlspecialchars($user_id) ?></p>
-                    </div>
-
-                    <div style="border-left-color: #3AAFA9;" class="border-l-4 pl-4">
-                        <p style="color: var(--text-secondary);" class="text-sm uppercase">Bergabung Sejak</p>
-                        <p class="text-lg font-semibold mt-1" style="color: var(--text-primary);">
-                            <?= date('d F Y H:i', strtotime($user['created_at'] ?? date('Y-m-d H:i:s'))) ?>
-                        </p>
-                    </div>
-
-                    <div style="border-left-color: #3AAFA9;" class="border-l-4 pl-4">
-                        <p style="color: var(--text-secondary);" class="text-sm uppercase">Status Akun</p>
-                        <p class="text-lg font-semibold mt-1" style="color: var(--text-primary);">✅ Aktif</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Account Statistics -->
-            <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-8">
-                <h3 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">📊 Statistik</h3>
-                
-                <div class="space-y-6">
-                    <div style="background: linear-gradient(135deg, rgba(58, 175, 169, 0.1) 0%, var(--bg-tertiary) 100%);" class="flex items-center justify-between p-4 rounded-lg">
-                        <div>
-                            <p style="color: var(--text-secondary);" class="text-sm">Total Sesi Chat</p>
-                            <p class="text-2xl font-bold mt-1" style="color: var(--text-primary);"><?= intval($total_sessions) ?></p>
-                        </div>
-                        <div class="text-4xl">💬</div>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, rgba(58, 175, 169, 0.08) 0%, var(--bg-tertiary) 100%);" class="flex items-center justify-between p-4 rounded-lg">
-                        <div>
-                            <p style="color: var(--text-secondary);" class="text-sm">Riwayat Aktivitas</p>
-                            <p class="text-2xl font-bold mt-1" style="color: var(--text-primary);"><?= count($activities) ?></p>
-                        </div>
-                        <div class="text-4xl">📝</div>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, rgba(58, 175, 169, 0.08) 0%, var(--bg-tertiary) 100%);" class="flex items-center justify-between p-4 rounded-lg">
-                        <div>
-                            <p style="color: var(--text-secondary);" class="text-sm">Profil Lengkap</p>
-                            <p class="text-2xl font-bold mt-1" style="color: var(--text-primary);">
-                                <?= isset($user['profile_picture']) && $user['profile_picture'] ? '100%' : '80%' ?>
-                            </p>
-                        </div>
-                        <div class="text-4xl">✅</div>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, rgba(58, 175, 169, 0.08) 0%, var(--bg-tertiary) 100%);" class="flex items-center justify-between p-4 rounded-lg">
-                        <div>
-                            <p style="color: var(--text-secondary);" class="text-sm">Member Sejak</p>
-                            <p class="text-2xl font-bold mt-1" style="color: var(--text-primary);">
-                                <?php
-                                $createdAt = new DateTime($user['created_at'] ?? date('Y-m-d'));
-                                $now = new DateTime();
-                                $interval = $createdAt->diff($now);
-                                echo $interval->days . ' hari';
-                                ?>
-                            </p>
-                        </div>
-                        <div class="text-4xl">📅</div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Recent Activities -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-8">
-            <h3 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">🔄 Aktivitas Terbaru</h3>
+        <aside style="width:260px; background: linear-gradient(180deg,#2fb39a,#1fa08e);" class="hidden md:flex flex-col p-6 text-white shadow-lg">
             
-            <?php if (empty($activities)): ?>
-                <div class="text-center py-12">
-                    <p style="color: var(--text-secondary);" class="text-lg">Belum ada aktivitas</p>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">AP</div>
+                <div>
+                    <div class="font-bold text-lg">Halo, <?= htmlspecialchars(explode(' ', $user['name'] ?? $user['email'])[0]) ?></div>
+                    <div class="text-sm opacity-90">Pengguna</div>
                 </div>
-            <?php else: ?>
-                <div class="space-y-4">
-                    <?php foreach ($activities as $activity): ?>
-                        <div style="border-left-color: #3AAFA9; background: var(--bg-secondary); border: 1px solid var(--border-color);" class="flex items-start gap-4 p-4 border-l-4 rounded-lg hover:shadow-md transition">
-                            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center" style="background: #3AAFA9; color: white;" class="rounded-lg text-xl">
-                                <?= formatActivity($activity) ?>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-semibold" style="color: var(--text-primary);"><?= formatActivity($activity) ?></p>
-                                <p style="color: var(--text-secondary);" class="text-sm mt-1">
-                                    <?php
-                                    if (!empty($activity['details'])) {
-                                        $details = json_decode($activity['details'], true);
-                                        if (is_array($details)) {
-                                            echo htmlspecialchars(implode(', ', array_values($details)));
-                                        }
-                                    }
-                                    ?>
-                                </p>
-                                <p style="color: var(--text-tertiary);" class="text-xs mt-2">
-                                    <?= date('d M Y H:i', strtotime($activity['created_at'])) ?>
-                                </p>
+            </div>
+            
+            <nav class="flex-1">
+                <a href="index.php?p=user_dashboard" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Beranda</a>
+                <a href="index.php?p=match" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Temukan Konselor</a>
+                <a href="index.php?p=chat" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Chat</a>
+                <a href="index.php?p=profile" class="block px-4 py-3 rounded-lg mb-2 font-semibold bg-white text-[#2fb39a] shadow-md">Profil & Preferensi</a>
+                <a href="index.php?p=user_settings" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Pengaturan</a>
+            </nav>
+            
+            <a href="index.php?p=logout" class="mt-4 inline-block px-4 py-3 bg-white/10 rounded-lg text-center hover:bg-white/20">Logout</a>
+        </aside>
+        <main class="flex-1 px-6 py-8" style="background-color: #f5f5f5;">
+            <div class="max-w-7xl mx-auto relative z-10 transition-colors duration-300">
+        
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">
+                    
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">👤 Profil Saya</h1>
+                       
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="text-gray-500 font-semibold text-lg">Search</div>
+                        <div class="flex items-center gap-3 bg-white rounded-lg px-3 py-2 border border-gray-200" id="search-box">
+                            <input id="search" placeholder="Informasi akun..." class="outline-none" style="background:transparent; width:150px; color:var(--text-primary);" />
+                        </div>
+                        <div class="text-gray-500 font-semibold text-lg">Filter</div>
+                        <select id="statusFilter" class="border rounded-lg px-3 py-2 bg-white outline-none">
+                            <option value="all">Status Akun</option>
+                        </select>
+                        <a href="index.php?p=match" class="px-4 py-2 bg-[#3AAFA9] text-white rounded-lg">Cari Konselor</a>
+                    </div>
+                </div>
+
+
+                <div class="grid md:grid-cols-3 gap-8 mb-8">
+                    
+                    <div class="md:col-span-1">
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-6 mb-8">
+                            <div class="flex flex-col items-start gap-4">
+                                <div class="w-full">
+                                    <h2 class="text-xl font-bold" style="color: var(--text-primary);"><?= htmlspecialchars($user['name'] ?? 'aqsha') ?></h2>
+                                    <p class="text-sm" style="color: var(--text-secondary);">📧 <?= htmlspecialchars($user['email']) ?></p>
+                                </div>
+                                
+                                <img src="<?= isset($user['profile_picture']) && $user['profile_picture'] ? "../uploads/profile/".htmlspecialchars($user['profile_picture']) : 'https://via.placeholder.com/200x200?text=Profile' ?>" 
+                                     alt="profile" class="w-32 h-32 object-cover rounded-xl shadow-lg border-4 border-[#3AAFA9]">
+                                
+                                <div class="grid grid-cols-4 gap-2 w-full mt-4">
+                                    <div class="text-center">
+                                        <p class="text-lg font-bold text-[#3AAFA9]">0</p>
+                                        <p class="text-xs text-gray-600">Total Sesi</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-lg font-bold text-[#17252A]">⭐</p>
+                                        <p class="text-xs text-gray-600">Member Aktif</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-lg font-bold text-[#3AAFA9]">3</p>
+                                        <p class="text-xs text-gray-600">Aktivitas</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-lg font-bold text-[#17252A]">✓</p>
+                                        <p class="text-xs text-gray-600">Terverifikasi</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col gap-3 w-full mt-4">
+                                    <a href="index.php?p=user_settings" class="px-6 py-2 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-semibold transition text-center">
+                                        ⚙️ Pengaturan Akun
+                                    </a>
+                                    <a href="index.php?p=match" class="px-6 py-2 border border-[#3AAFA9] text-[#3AAFA9] rounded-lg hover:bg-[#F7FBFB] font-semibold transition text-center">
+                                        💬 Cari Konselor
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
+                    </div>
+                    
+                    <div class="md:col-span-2 space-y-8">
+                        
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-6">
+                            <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Informasi Akun</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Email</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= htmlspecialchars($user['email']) ?></p>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Nama Lengkap</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= htmlspecialchars($user['name'] ?? '-') ?></p>
+                                </div>
 
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Role</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);">Pengguna</p>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Status Akun</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);">Aktif</p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Bergabung Sejak</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= date('d F Y', strtotime($user['created_at'] ?? date('Y-m-d H:i:s'))) ?></p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-x-8 text-sm">
+                                    <p style="color: var(--text-secondary);">Total Keanggotaan</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);">
+                                        <?= $interval->days . ' hari' ?>
+                                    </p></div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-6">
+                            <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Statistik</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Total Sesi Chat</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= intval($total_sessions) ?></p>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Riwayat Aktivitas</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= count($activities) ?></p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-x-8 text-sm border-b pb-2" style="border-color: var(--border-color);">
+                                    <p style="color: var(--text-secondary);">Profil Lengkap</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= isset($user['profile_picture']) && $user['profile_picture'] ? '100%' : '80%' ?></p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-x-8 text-sm">
+                                    <p style="color: var(--text-secondary);">Total Keanggotaan</p>
+                                    <p class="font-semibold" style="color: var(--text-primary);"><?= $interval->days ?> hari</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color);" class="rounded-2xl soft-shadow p-6">
+                            <h3 class="text-xl font-bold mb-4" style="color: var(--text-primary);">Aktivitas Terbaru</h3>
+                            
+                            <?php if (empty($activities)): ?>
+                                <div class="text-center py-4">
+                                    <p style="color: var(--text-secondary);">Belum ada aktivitas</p>
+                                </div>
+                            <?php else: ?>
+                                <div class="space-y-4">
+                                    <?php $activityCount = count($activities); ?>
+                                    <?php foreach ($activities as $index => $activity): ?>
+                                        <?php 
+                                        // Menghilangkan border-b pada item terakhir
+                                        $borderClass = ($index < $activityCount - 1) ? 'border-b pb-2' : '';
+                                        ?>
+                                        <div class="grid grid-cols-2 gap-x-8 text-sm <?= $borderClass ?>" style="border-color: var(--border-color);">
+                                            <p style="color: var(--text-secondary);">
+                                                <?= getActionEmoji($activity) ?> <?= formatActivity($activity) ?>
+                                            </p>
+                                            <p class="font-semibold" style="color: var(--text-primary);">
+                                                <?= date('d M Y H:i', strtotime($activity['created_at'])) ?>
+                                            </p>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </main>
     </div>
 </div>
 
 <style>
-.soft-shadow { box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
-
-html.dark-mode .bg-gradient-to-r {
-    background: linear-gradient(to right, rgba(58, 175, 169, 0.15), rgba(58, 175, 169, 0.05));
+.soft-shadow { 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
+    transition: all 0.3s ease;
+}
+.soft-shadow:hover {
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
 }
 
-html.dark-mode .bg-blue-100,
-html.dark-mode .bg-green-100,
-html.dark-mode .bg-purple-100 {
-    background: rgba(58, 175, 169, 0.1);
-}
-
-html.dark-mode .border-l-4 {
-    border-left-color: #4DBBB0;
-}
-
+/* Tambahkan style untuk Dark Mode jika perlu */
 html.dark-mode .bg-\[\#F7FBFB\] {
     background-color: var(--bg-tertiary);
 }
-/* small helper styles for this page */
-.theme-active { transition: background-color 0.25s ease, color 0.25s ease; }
 </style>
 
 <script>
-// Theme toggle: persists to localStorage and applies 'dark-mode' on html
-(function(){
-    const key = 'darkMode';
-    const btn = document.getElementById('theme-toggle');
-    if (!btn) return;
+// Penyesuaian search bar agar sesuai dengan gambar
+document.addEventListener('DOMContentLoaded', function(){
+    const searchBox = document.getElementById('search-box');
+    const searchInput = document.getElementById('search');
+    const statusFilter = document.getElementById('statusFilter');
 
-    function applyDark(dark){
-        if(dark) document.documentElement.classList.add('dark-mode');
-        else document.documentElement.classList.remove('dark-mode');
-        btn.textContent = dark ? '☀️' : '🌙';
+    // Mengubah tampilan elemen search & filter agar persis seperti di gambar
+    if (searchBox) {
+        searchBox.style.border = '1px solid var(--border-color)'; 
+        searchBox.style.borderRadius = '8px';
+        searchBox.style.padding = '8px 12px';
+        searchBox.style.width = '250px'; // Memberi lebar yang konsisten
     }
-
-    // init from localStorage (align with global init in index.php)
-    try{
-        const stored = localStorage.getItem(key);
-        const isDark = stored === 'true' || (stored === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        applyDark(isDark);
-    }catch(e){ /* ignore storage errors */ }
-
-    btn.addEventListener('click', function(){
-        const isDark = document.documentElement.classList.toggle('dark-mode');
-        try{ localStorage.setItem(key, isDark ? 'true' : 'false'); }catch(e){}
-        applyDark(isDark);
-    });
-})();
+    
+    // Penyesuaian input text
+    if (searchInput) {
+        searchInput.placeholder = "Informasi akun...";
+        searchInput.style.border = 'none';
+        searchInput.style.width = '100%'; // Mengisi lebar kontainer
+    }
+    
+    // Penyesuaian select filter
+    if (statusFilter) {
+        statusFilter.style.border = '1px solid var(--border-color)'; 
+        statusFilter.style.borderRadius = '8px';
+        statusFilter.style.width = '150px'; // Lebar filter
+    }
+});
 </script>
-<?php

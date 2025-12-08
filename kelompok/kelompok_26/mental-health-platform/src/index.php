@@ -352,6 +352,17 @@ if (isset($_GET['p'])) {
         case 'profile':
             load_view("profile/user_profile");
             break;
+        
+        case 'payments':
+            load_view("payments/payment_page"); 
+            break;
+
+        // BARU: Controller untuk Upload Bukti Pembayaran
+        case 'upload_payment_proof':
+            require_once __DIR__ . '/controllers/PaymentController.php';
+            $paymentController = new PaymentController($conn);
+            $paymentController->uploadProof();
+            break;
 
         default:
             load_view("404");

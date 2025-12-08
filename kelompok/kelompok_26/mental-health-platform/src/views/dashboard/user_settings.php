@@ -52,7 +52,7 @@ unset($_SESSION['success'], $_SESSION['error']);
         <!-- Header -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-[#17252A]">⚙️ Pengaturan Akun</h1>
+                <h1 class="text-3xl font-bold text-[#17252A]">Pengaturan Akun</h1>
                 <p class="text-gray-600 mt-2">Kelola profil, keamanan, dan preferensi Anda</p>
             </div>
             <a href="index.php?p=user_dashboard" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#17252A] rounded-lg font-semibold transition">
@@ -64,13 +64,13 @@ unset($_SESSION['success'], $_SESSION['error']);
         <div class="mb-8 bg-white rounded-xl soft-shadow overflow-hidden">
             <div class="flex flex-wrap border-b border-gray-200">
                 <button onclick="showTab('tab-profile')" class="settings-tab active px-6 py-4 font-semibold text-[#17252A] border-b-2 border-[#3AAFA9] whitespace-nowrap">
-                    👤 Edit Profil
+                    Edit Profil
                 </button>
                 <button onclick="showTab('tab-photo')" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
-                    📷 Foto Profil
+                    Foto Profil
                 </button>
                 <button onclick="showTab('tab-password')" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
-                    🔐 Ubah Password
+                    Ubah Password
                 </button>
             </div>
 
@@ -105,7 +105,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                             </div>
 
                             <button type="submit" class="w-full px-6 py-3 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-bold transition">
-                                💾 Simpan Perubahan Profil
+                                 Simpan Perubahan Profil
                             </button>
                         </form>
                     </div>
@@ -123,14 +123,14 @@ unset($_SESSION['success'], $_SESSION['error']);
                                     <img src="<?= isset($user['profile_picture']) && $user['profile_picture'] ? "../uploads/profile/".htmlspecialchars($user['profile_picture']) : 'https://via.placeholder.com/180x180?text=Profile' ?>" 
                                          alt="profile" class="w-48 h-48 object-cover rounded-2xl shadow-lg border-4 border-[#3AAFA9]">
                                     <div class="absolute bottom-0 right-0 bg-[#3AAFA9] text-white p-3 rounded-full shadow-lg">
-                                        📷
+                                        
                                     </div>
                                 </div>
                             </div>
 
                             <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
                                 <p class="text-sm text-blue-800">
-                                    💡 <strong>Tips:</strong> Gunakan foto berkualitas tinggi dengan wajah yang jelas untuk hasil terbaik.
+                                    <strong>Tips:</strong> Gunakan foto berkualitas tinggi dengan wajah yang jelas untuk hasil terbaik.
                                 </p>
                             </div>
 
@@ -148,7 +148,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                             </div>
 
                             <button type="submit" class="w-full px-6 py-3 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-bold transition">
-                                📤 Upload Foto Profil
+                                Upload Foto Profil
                             </button>
                         </form>
                     </div>
@@ -161,7 +161,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <div class="max-w-2xl">
                         <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-6">
                             <p class="text-sm text-yellow-800">
-                                🔒 <strong>Keamanan:</strong> Password Anda akan dienkripsi. Kami tidak akan pernah meminta password melalui email.
+                                <strong>Keamanan:</strong> Password Anda akan dienkripsi. Kami tidak akan pernah meminta password melalui email.
                             </p>
                         </div>
 
@@ -191,7 +191,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                             </div>
 
                             <button type="submit" class="w-full px-6 py-3 bg-[#17252A] text-white rounded-lg hover:bg-[#0F1920] font-bold transition">
-                                🔐 Update Password
+                                Update Password
                             </button>
                         </form>
                     </div>
@@ -202,7 +202,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 
         <!-- Additional Info Section -->
         <div class="bg-white rounded-xl soft-shadow p-8 mt-8">
-            <h3 class="text-lg font-bold text-[#17252A] mb-4">📋 Informasi Akun</h3>
+            <h3 class="text-lg font-bold text-[#17252A] mb-4">Informasi Akun</h3>
             <div class="grid md:grid-cols-2 gap-6">
                 <div class="p-4 bg-[#F7FBFB] rounded-lg">
                     <p class="text-xs text-gray-600 uppercase">Status</p>

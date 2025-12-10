@@ -694,7 +694,7 @@ $admin = $_SESSION['user'];
       return { points, draw };
     }
 
-    // create charts
+    // create charts x
     const cpuChartObj = createChart(document.getElementById('cpuChart'), '#0779e4');
     const memChartObj = createChart(document.getElementById('memChart'), '#3AAFA9');
 

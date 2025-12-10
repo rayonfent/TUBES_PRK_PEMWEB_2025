@@ -28,13 +28,18 @@ $error_msg = $_SESSION['error'] ?? null;
 unset($_SESSION['success'], $_SESSION['error']);
 ?>
 
-<div class="min-h-screen px-6 py-20" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: hidden; transition: background-color 0.3s ease;">
+<div class="min-h-screen" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: hidden; transition: background-color 0.3s ease;">
     
     <!-- Decorative Background Elements -->
     <div style="position: fixed; top: -50%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(58, 175, 169, 0.1) 0%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none;"></div>
     <div style="position: fixed; bottom: -30%; left: -5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(23, 37, 42, 0.05) 0%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
-    <div class="max-w-4xl mx-auto relative z-10">
+    <!-- Sidebar -->
+    <?php $current_page = 'user_settings'; include __DIR__ . '/../partials/sidebar.php'; ?>
+
+    <!-- Main Content -->
+    <div class="ml-64 px-6 py-20">
+        <div class="max-w-4xl mx-auto relative z-10">
         
         <!-- Success/Error Messages -->
         <?php if ($success_msg): ?>
@@ -55,9 +60,6 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <h1 class="text-3xl font-bold text-[#17252A]">Pengaturan Akun</h1>
                 <p class="text-gray-600 mt-2">Kelola profil, keamanan, dan preferensi Anda</p>
             </div>
-            <a href="index.php?p=user_dashboard" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#17252A] rounded-lg font-semibold transition">
-                ← Kembali ke Dashboard
-            </a>
         </div>
 
         <!-- Settings Navigation Tabs -->
@@ -223,6 +225,7 @@ unset($_SESSION['success'], $_SESSION['error']);
             </div>
         </div>
 
+        </div>
     </div>
 </div>
 

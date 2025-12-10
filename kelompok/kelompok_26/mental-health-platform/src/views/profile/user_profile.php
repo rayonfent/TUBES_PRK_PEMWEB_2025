@@ -77,7 +77,6 @@ function getActionEmoji($activity) {
     return $actions[$activity['action']] ?? '📝';
 }
 
-$currentPage = 'profile'; 
 $createdAt = new DateTime($user['created_at'] ?? date('Y-m-d'));
 $now = new DateTime();
 $interval = $createdAt->diff($now);
@@ -87,27 +86,9 @@ $interval = $createdAt->diff($now);
     
     <div class="flex min-h-screen">
 
-        <aside style="width:260px; background: linear-gradient(180deg,#2fb39a,#1fa08e);" class="hidden md:flex flex-col p-6 text-white shadow-lg">
-            
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">AP</div>
-                <div>
-                    <div class="font-bold text-lg">Halo, <?= htmlspecialchars(explode(' ', $user['name'] ?? $user['email'])[0]) ?></div>
-                    <div class="text-sm opacity-90">Pengguna</div>
-                </div>
-            </div>
-            
-            <nav class="flex-1">
-                <a href="index.php?p=user_dashboard" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Beranda</a>
-                <a href="index.php?p=match" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Temukan Konselor</a>
-                <a href="index.php?p=chat" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Chat</a>
-                <a href="index.php?p=profile" class="block px-4 py-3 rounded-lg mb-2 font-semibold bg-white text-[#2fb39a] shadow-md">Profil & Preferensi</a>
-                <a href="index.php?p=user_settings" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Pengaturan</a>
-            </nav>
-            
-            <a href="index.php?p=logout" class="mt-4 inline-block px-4 py-3 bg-white/10 rounded-lg text-center hover:bg-white/20">Logout</a>
-        </aside>
-        <main class="flex-1 px-6 py-8" style="background-color: #f5f5f5;">
+        <?php $current_page = 'profile'; include dirname(__DIR__) . '/partials/sidebar.php'; ?>
+
+        <main class="flex-1 px-6 py-8" style="background-color: #f5f5f5; margin-left:260px;">
             <div class="max-w-7xl mx-auto relative z-10 transition-colors duration-300">
         
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">

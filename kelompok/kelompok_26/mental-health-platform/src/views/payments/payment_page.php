@@ -75,7 +75,7 @@ $error_msg = $_SESSION['error'] ?? null;
 unset($_SESSION['success'], $_SESSION['error']);
 ?>
 
-<div class="payment-page-bg min-h-screen px-6 py-20 relative overflow-hidden">
+<div class="payment-page-bg min-h-screen relative overflow-hidden">
     <div class="decorative-overlay">
         <div class="absolute top-20 left-10 text-6xl text-opacity-20 text-gray-400 transform -rotate-12 icon-credit-card opacity-30">💳</div>
         <div class="absolute top-1/4 right-5 text-6xl text-opacity-20 text-green-400 transform rotate-6 icon-shield opacity-30">🛡️</div>
@@ -83,18 +83,21 @@ unset($_SESSION['success'], $_SESSION['error']);
         <div class="absolute bottom-10 right-20 text-6xl text-opacity-20 text-yellow-400 transform rotate-12 icon-check opacity-30">✅</div>
     </div>
     
-    <div class="max-w-4xl mx-auto relative z-10">
+    <!-- Sidebar -->
+    <?php $current_page = 'payments'; include __DIR__ . '/../partials/sidebar.php'; ?>
+    
+    <!-- Main Content -->
+    <div class="ml-64 px-6 py-20">
+        <div class="max-w-4xl mx-auto relative z-10">
         
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-extrabold text-[#17252A] flex items-center gap-2">
                     <span class="text-[#3AAFA9] text-4xl"></span>Kelola Pembayaran
                 </h1>
-                <p class="text-gray-600 mt-2">Status langganan dan unggah bukti transfer.</p>
+                <p class="text-gray-600 mt-2">  Status langganan dan unggah bukti transfer.</p>
             </div>
-            <a href="index.php?p=user_dashboard" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-[#17252A] rounded-full font-semibold transition shadow-md">
-                ← Kembali
-            </a>
+    
         </div>
 
         <?php if ($success_msg): ?>
@@ -148,14 +151,14 @@ unset($_SESSION['success'], $_SESSION['error']);
              <div class="md:col-span-3">
                 <h3 class="font-bold text-xl text-[#17252A] mb-4">Pilih Metode Pembayaran</h3>
 
-                <div class="space-y-3 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label class="payment-option flex items-center p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-[#3AAFA9] transition duration-300" data-method="transfer">
+                <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+                    <label class="payment-option h-full flex items-center p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-[#3AAFA9] transition duration-300" data-method="transfer">
                         <input type="radio" name="payment_method" value="transfer" class="mr-3 text-[#3AAFA9] focus:ring-[#3AAFA9]" checked onclick="selectPaymentMethod('transfer')">
                         <span class="font-bold text-[#17252A] flex items-center gap-2">
                             🏦 Bank Transfer
                         </span>
                     </label>
-                    <label class="payment-option flex items-center p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-[#3AAFA9] transition duration-300" data-method="qris">
+                    <label class="payment-option h-full flex items-center p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-[#3AAFA9] transition duration-300" data-method="qris">
                         <input type="radio" name="payment_method" value="qris" class="mr-3 text-[#3AAFA9] focus:ring-[#3AAFA9]" onclick="selectPaymentMethod('qris')">
                         <span class="font-bold text-[#17252A] flex items-center gap-2">
                             📱 QRIS
@@ -186,7 +189,7 @@ unset($_SESSION['success'], $_SESSION['error']);
             </div>
         </div>
 
-        <div id="uploadProofSection" class="bg-white soft-shadow-lg rounded-2xl p-8 border border-gray-100">
+        <div id="uploadProofSection" class="bg-white soft-shadow-lg rounded-2xl p-8 border border-gray-100 mb-8">
             <h2 class="text-2xl font-bold text-[#17252A] mb-6 flex items-center gap-2">
                 <span class="text-xl text-yellow-600">📎</span> Unggah Bukti Pembayaran
             </h2>
@@ -198,7 +201,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="index.php?p=upload_payment_proof" enctype="multipart/form-data" class="max-w-xl space-y-6">
+            <form method="POST" action="index.php?p=upload_payment_proof" enctype="multipart/form-data" class="space-y-6">
                 
                 <?php if ($subscription): ?>
                     <input type="hidden" name="subscription_id" value="<?= $subscription['subscription_id'] ?>">
@@ -230,6 +233,7 @@ unset($_SESSION['success'], $_SESSION['error']);
             </form>
         </div>
 
+        </div>
     </div>
 </div>
 
@@ -308,6 +312,9 @@ unset($_SESSION['success'], $_SESSION['error']);
 .payment-option input:checked {
     border-color: #3AAFA9;
 }
+
+/* Make payment option cards equal height */
+.payment-option { min-height: 110px; }
 
 
 /* Ensure icons are modern emojis/symbols */

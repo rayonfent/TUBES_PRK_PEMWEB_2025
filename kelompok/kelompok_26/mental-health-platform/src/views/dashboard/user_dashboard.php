@@ -95,39 +95,15 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
 
 // average rating given? (if there is a table user_ratings) — optional, skip if not exist
 ?>
-<div class="min-h-screen" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: hidden;">
+<div class="min-h-screen" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: visible;">
 
     <!-- Layout: Sidebar + Main -->
     <div class="flex min-h-screen">
 
-        <!-- SIDEBAR (user-focused: simplified) -->
-        <aside style="width:260px; background: linear-gradient(180deg,#2fb39a,#1fa08e);" class="hidden md:flex flex-col p-6 text-white shadow-lg">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">AP</div>
-                <div>
-                    <div class="font-bold text-lg">Halo, <?= htmlspecialchars(explode(' ', $user['name'] ?? $user['email'])[0]) ?></div>
-                    <div class="text-sm opacity-90">Pengguna</div>
-                </div>
-            </div>
-
-            <nav class="flex-1">
-                <a href="index.php?p=user_dashboard" class="block px-4 py-3 rounded-lg bg-white/10 mb-2 font-semibold">Beranda</a>
-                <a href="index.php?p=match" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Temukan Konselor</a>
-                <a href="index.php?p=chat" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Chat</a>
-                <a href="index.php?p=profile" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Profil & Preferensi</a>
-                <a href="index.php?p=user_settings" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Pengaturan</a>
-            </nav>
-
-            <div class="mt-4 p-4 bg-white/10 rounded-lg text-sm">
-                <div class="font-semibold"><?= htmlspecialchars($user['name'] ?? $user['email']) ?></div>
-                <div class="text-xs opacity-90"><?= htmlspecialchars($user['email']) ?></div>
-            </div>
-
-            <a href="index.php?p=logout" class="mt-4 inline-block px-4 py-3 bg-white/10 rounded-lg text-center">Logout</a>
-        </aside>
+        <?php $current_page = 'user_dashboard'; include dirname(__DIR__) . '/partials/sidebar.php'; ?>
 
         <!-- MAIN CONTENT -->
-        <main class="flex-1 px-6 py-8">
+        <main class="flex-1 px-6 py-8" style="margin-left:260px;">
             <!-- Decorative Background Elements -->
             <div style="position: fixed; top: -50%; right: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(58, 175, 169, 0.06) 0%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none;"></div>
             <div style="position: fixed; bottom: -30%; left: -5%; width: 500px; height: 500px; background: radial-gradient(circle, rgba(23, 37, 42, 0.03) 0%, transparent 70%); border-radius: 50%; z-index: 0; pointer-events: none;"></div>
@@ -239,7 +215,7 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
                                 <div class="flex items-center gap-3">
                                     <div style="min-width:110px; text-align:center;">
                                         <div style="font-weight:600; color:<?= ($s['status']??'')==='active' ? '#047857' : '#4b5563' ?>;"><?= htmlspecialchars(ucfirst($s['status'] ?? '—')) ?></div>
-                                        <div class="text-xs" style="color:var(--text-secondary);"><?= intval($s['messages_count'] ?? 1) ?> sesi</div>
+                                        <div class="text-xs" style="color:var(--text-secondary);"><?= intval($s['messages_count'] ?? 1) ?> pesan</div>
                                     </div>
 
                                     <?php if (($s['status'] ?? '') === 'active' || ($s['status'] ?? '') === 'trial'): ?>
@@ -247,6 +223,13 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
                                     <?php else: ?>
                                         <a href="index.php?p=match" class="px-4 py-2 border border-[#3AAFA9] text-[#3AAFA9] rounded-lg">Cari Konselor</a>
                                     <?php endif; ?>
+                                    
+                                    <!-- Tombol Hapus Sesi -->
+                                    <button onclick="confirmDeleteSession(<?= intval($s['session_id']) ?>)" 
+                                            class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition" 
+                                            title="Hapus riwayat sesi">
+                                        🗑️
+                                    </button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -254,135 +237,98 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
                 </div>
 
             </div>
+            
+            <!-- Survey & Pembayaran Section -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <!-- Ringkasan Survey -->
+                <div class="card-gradient rounded-2xl soft-shadow p-6 card-animate">
+                    <h3 class="font-semibold text-[#17252A] mb-3">Ringkasan Survey</h3>
 
-        </div>
-                <h3 class="font-semibold text-[#17252A] mb-3">Ringkasan Survey</h3>
-
-                <?php if ($survey): ?>
-                    <div class="text-sm text-gray-600 mb-3">
-                        Terakhir diisi: <?= date('d M Y, H:i', strtotime($survey['created_at'] ?? $survey['survey_id'])) ?>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="text-xs text-gray-500">Gaya Komunikasi (Tegas vs Lembut)</div>
-                        <?php
-                            $d = 0; $g = 0;
-                            if ($survey['q1']==1) $d++; else $g++;
-                            if ($survey['q2']==1) $d++; else $g++;
-                            if ($survey['q3']==1) $d++; else $g++;
-                            $total = $d+$g;
-                            $d_pct = $total? round(($d/$total)*100):0;
-                            $g_pct = 100 - $d_pct;
-                        ?>
-                        <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
-                            <div class="h-full bg-[#3AAFA9]" style="width: <?= $d_pct ?>%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-2">
-                            <span>Tegas <?= $d_pct ?>%</span>
-                            <span>Lembut <?= $g_pct ?>%</span>
+                    <?php if ($survey): ?>
+                        <div class="text-sm text-gray-600 mb-3">
+                            Terakhir diisi: <?= date('d M Y, H:i', strtotime($survey['created_at'] ?? $survey['survey_id'])) ?>
                         </div>
 
-                        <div class="mt-4 text-xs text-gray-500">Pendekatan Emosional</div>
-                        <?php
-                            $emo_log = ($survey['q4']==1)?100:0;
-                        ?>
-                        <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
-                            <div class="h-full bg-[#17252A]" style="width: <?= $emo_log ?>%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500 mt-2">
-                            <span>Logis</span>
-                            <span>Emosional</span>
-                        </div>
+                        <div class="space-y-3">
+                            <div class="text-xs text-gray-500">Gaya Komunikasi (Tegas vs Lembut)</div>
+                            <?php
+                                $d = 0; $g = 0;
+                                if ($survey['q1']==1) $d++; else $g++;
+                                if ($survey['q2']==1) $d++; else $g++;
+                                if ($survey['q3']==1) $d++; else $g++;
+                                $total = $d+$g;
+                                $d_pct = $total? round(($d/$total)*100):0;
+                                $g_pct = 100 - $d_pct;
+                            ?>
+                            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#3AAFA9]" style="width: <?= $d_pct ?>%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                <span>Tegas <?= $d_pct ?>%</span>
+                                <span>Lembut <?= $g_pct ?>%</span>
+                            </div>
 
-                        <div class="mt-4 text-sm">
-                            <a href="index.php?p=match" class="text-[#3AAFA9] font-semibold">Lihat hasil kecocokan</a>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div class="text-sm text-gray-600">
-                        Kamu belum mengisi survey. <a href="index.php?p=survey" class="text-[#3AAFA9] font-semibold">Isi sekarang</a>
-                    </div>
-                <?php endif; ?>
-            </div>
+                            <div class="mt-4 text-xs text-gray-500">Pendekatan Emosional</div>
+                            <?php
+                                $emo_log = ($survey['q4']==1)?100:0;
+                            ?>
+                            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                                <div class="h-full bg-[#17252A]" style="width: <?= $emo_log ?>%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                <span>Logis</span>
+                                <span>Emosional</span>
+                            </div>
 
-            <!-- SUBSCRIPTION / ACTIONS -->
-            <div class="card-gradient rounded-2xl soft-shadow p-6 card-animate" style="animation-delay: 0.2s;">
-                <h3 class="font-semibold text-[#17252A] mb-3">Akun & Pembayaran</h3>
-
-                <?php if ($payment): ?>
-                    <div class="text-sm text-gray-700 mb-2">Plan: <strong><?= htmlspecialchars($payment['plan'] ?? '—') ?></strong></div>
-                    <div class="text-sm text-gray-500 mb-4">Status: <strong><?= htmlspecialchars($payment['status']) ?></strong></div>
-                    <div class="text-sm text-gray-500 mb-4">Berakhir: <strong><?= htmlspecialchars($payment['expires_at'] ?? '-') ?></strong></div>
-
-                    <a href="index.php?p=payments" class="block px-4 py-2 bg-[#3AAFA9] text-white rounded-lg text-center">Kelola Pembayaran</a>
-                <?php else: ?>
-                    <div class="text-sm text-gray-600 mb-4">Kamu berada di periode trial 1 hari (jika sudah memulai sesi).</div>
-                    <a href="index.php?p=payments" class="block px-4 py-2 bg-[#17252A] text-white rounded-lg text-center">Berlangganan</a>
-                <?php endif; ?>
-
-                <div class="mt-4">
-                    <a href="index.php?p=profile" class="text-sm text-gray-500">Edit profil & preferensi</a>
-                </div>
-            </div>
-
-        </div> <!-- grid -->
-
-        <!-- RECENT SESSIONS -->
-        <div class="card-gradient rounded-2xl soft-shadow p-6 mb-10 card-animate" style="animation-delay: 0.3s;">
-            <h3 class="text-xl font-semibold text-[#17252A] mb-4">Riwayat Sesi Terbaru</h3>
-
-            <?php if (empty($sessions)): ?>
-                <div class="text-gray-600">Belum ada sesi.</div>
-            <?php else: ?>
-                <div class="space-y-4">
-                <?php foreach ($sessions as $s): ?>
-                    <div class="flex items-center justify-between gap-4 p-4 rounded-lg border">
-                        <div class="flex items-center gap-4">
-                            <img src="<?= isset($s['konselor_pic']) && $s['konselor_pic'] ? "./uploads/konselor/".htmlspecialchars($s['konselor_pic']) : 'https://via.placeholder.com/56x56?text=K' ?>"
-                                 class="w-14 h-14 object-cover rounded-lg">
-                            <div>
-                                <div class="font-semibold"><?= htmlspecialchars($s['konselor_name'] ?? '—') ?></div>
-                                <div class="text-xs text-gray-500">Mulai: <?= date('d M Y H:i', strtotime($s['started_at'] ?? $s['created_at'] ?? '-')) ?></div>
-                                <div class="text-xs text-gray-500">Status: <?= htmlspecialchars($s['status'] ?? '—') ?></div>
+                            <div class="mt-4 text-sm">
+                                <a href="index.php?p=match" class="text-[#3AAFA9] font-semibold">Lihat hasil kecocokan</a>
                             </div>
                         </div>
-
-                        <div class="flex items-center gap-3">
-                            <?php if (($s['status'] ?? '') === 'active' || ($s['status'] ?? '') === 'trial'): ?>
-                                <a href="index.php?p=chat&session_id=<?= intval($s['session_id']) ?>"
-                                   class="px-4 py-2 bg-[#3AAFA9] text-white rounded-lg">Lanjutkan Chat</a>
-                            <?php else: ?>
-                                <a href="index.php?p=match"
-                                   class="px-4 py-2 border border-[#17252A] text-[#17252A] rounded-lg">Cari Konselor Lain</a>
-                            <?php endif; ?>
+                    <?php else: ?>
+                        <div class="text-sm text-gray-600">
+                            Kamu belum mengisi survey. <a href="index.php?p=survey" class="text-[#3AAFA9] font-semibold">Isi sekarang</a>
                         </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-            <?php endif; ?>
-        </div>
 
-        <!-- QUICK ACTIONS -->
-        <div class="grid md:grid-cols-3 gap-6 mb-10">
-            <a href="index.php?p=match" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.4s;">
-                <div class="font-semibold text-[#17252A]">Temukan Konselor</div>
-                <div class="text-sm text-gray-500 mt-2">Mulai sesi trial 1 hari</div>
-            </a>
+                <!-- Akun & Pembayaran -->
+                <div class="card-gradient rounded-2xl soft-shadow p-6 card-animate" style="animation-delay: 0.2s;">
+                    <h3 class="font-semibold text-[#17252A] mb-3">Akun & Pembayaran</h3>
 
-            <a href="index.php?p=survey" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.5s;">
-                <div class="font-semibold text-[#17252A]">Perbarui Survey</div>
-                <div class="text-sm text-gray-500 mt-2">Ubah preferensimu kapan saja</div>
-            </a>
+                    <?php if ($payment): ?>
+                        <div class="text-sm text-gray-700 mb-2">Plan: <strong><?= htmlspecialchars($payment['plan'] ?? '—') ?></strong></div>
+                        <div class="text-sm text-gray-500 mb-4">Status: <strong><?= htmlspecialchars($payment['status']) ?></strong></div>
+                        <div class="text-sm text-gray-500 mb-4">Berakhir: <strong><?= htmlspecialchars($payment['expires_at'] ?? '-') ?></strong></div>
 
-            <a href="index.php?p=payments" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.6s;">
-                <div class="font-semibold text-[#17252A]">Pembayaran</div>
-                <div class="text-sm text-gray-500 mt-2">Atur langganan & metode pembayaran</div>
-            </a>
-        </div>
+                        <a href="index.php?p=payments" class="block px-4 py-2 bg-[#3AAFA9] text-white rounded-lg text-center">Kelola Pembayaran</a>
+                    <?php else: ?>
+                        <div class="text-sm text-gray-600 mb-4">Kamu berada di periode trial 1 hari (jika sudah memulai sesi).</div>
+                        <a href="index.php?p=payments" class="block px-4 py-2 bg-[#17252A] text-white rounded-lg text-center">Berlangganan</a>
+                    <?php endif; ?>
 
-
+                    <div class="mt-4">
+                        <a href="index.php?p=profile" class="text-sm text-gray-500">Edit profil & preferensi</a>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="grid md:grid-cols-3 gap-6 mb-10">
+                <a href="index.php?p=match" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.4s;">
+                    <div class="font-semibold text-[#17252A]">Temukan Konselor</div>
+                    <div class="text-sm text-gray-500 mt-2">Mulai sesi trial 1 hari</div>
+                </a>
+
+                <a href="index.php?p=survey" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.5s;">
+                    <div class="font-semibold text-[#17252A]">Perbarui Survey</div>
+                    <div class="text-sm text-gray-500 mt-2">Ubah preferensimu kapan saja</div>
+                </a>
+
+                <a href="index.php?p=payments" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.6s;">
+                    <div class="font-semibold text-[#17252A]">Pembayaran</div>
+                    <div class="text-sm text-gray-500 mt-2">Atur langganan & metode pembayaran</div>
+                </a>
+            </div>
 
             </div>
         </main>
@@ -498,4 +444,11 @@ document.addEventListener('DOMContentLoaded', function(){
     search.addEventListener('input', filterRows);
     status.addEventListener('change', filterRows);
 });
+
+// Fungsi konfirmasi hapus sesi
+function confirmDeleteSession(sessionId) {
+    if (confirm('Apakah Anda yakin ingin menghapus riwayat sesi ini? Semua pesan dalam sesi ini juga akan dihapus.')) {
+        window.location.href = 'index.php?p=delete_session&session_id=' + sessionId;
+    }
+}
 </script>

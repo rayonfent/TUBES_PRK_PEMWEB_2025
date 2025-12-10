@@ -26,24 +26,9 @@ if ($session_id) {
 <div class="min-h-screen" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 50%, var(--bg-primary) 100%);">
 
     <div class="flex min-h-screen">
-        <!-- Sidebar (small) -->
-        <aside id="sidebar" style="width:260px; background: linear-gradient(180deg,#2fb39a,#1fa08e);" class="hidden md:flex flex-col p-6 text-white shadow-lg">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">AP</div>
-                <div>
-                    <div class="font-bold text-lg">Astral Psychologist</div>
-                    <div class="text-sm opacity-90">Pengguna</div>
-                </div>
-            </div>
-            <nav class="flex-1">
-                <a href="index.php?p=user_dashboard" class="block px-4 py-3 rounded-lg bg-white/10 mb-2 font-semibold">Beranda</a>
-                <a href="index.php?p=match" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Temukan Konselor</a>
-                <a href="index.php?p=chat" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Chat</a>
-                <a href="index.php?p=profile" class="block px-4 py-3 rounded-lg hover:bg-white/5 mb-2">Profil</a>
-            </nav>
-        </aside>
+        <?php $current_page = 'chat'; include dirname(__DIR__) . '/partials/sidebar.php'; ?>
 
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-6" style="margin-left:260px;">
             <div class="max-w-6xl mx-auto">
                 <div class="flex items-start gap-6">
                     <div class="mb-4 flex items-center justify-between md:hidden">
@@ -119,13 +104,13 @@ if ($session_id) {
 </div>
 
 <script>
-// Mock sending messages (client-side only for reference)
 document.addEventListener('DOMContentLoaded', function(){
     const send = document.getElementById('sendBtn');
     const input = document.getElementById('messageInput');
     const list = document.getElementById('messageList');
     const mobileToggle = document.getElementById('mobileToggle');
     const sidebar = document.getElementById('sidebar');
+    const sessionId = <?= $session_id ? intval($session_id) : 0 ?>;
 
     if (mobileToggle && sidebar) {
         mobileToggle.addEventListener('click', function(){
@@ -133,39 +118,83 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 
-    if (!send || !input || !list) return;
+    if (!list) return;
 
-    function appendMessage(text, isOwner){
-        const wrap = document.createElement('div');
-        wrap.className = 'mb-4 ' + (isOwner ? 'text-right' : '');
-        const time = document.createElement('div'); time.className='msg-time'; time.innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const msg = document.createElement('div');
-        msg.className = isOwner ? 'bubble-right' : 'bubble-left';
-        msg.innerText = text;
-        wrap.appendChild(time); wrap.appendChild(msg);
-        list.appendChild(wrap);
+    function renderMessages(messages){
+        list.innerHTML = '';
+        messages.forEach(m => {
+            const wrap = document.createElement('div');
+            wrap.className = 'mb-4 ' + (m.sender_type === 'user' ? 'text-right' : '');
+            const time = document.createElement('div'); time.className='msg-time';
+            const dt = new Date(m.created_at);
+            time.innerText = dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const msg = document.createElement('div');
+            msg.className = (m.sender_type === 'user') ? 'bubble-right' : 'bubble-left';
+            msg.innerText = m.message;
+            wrap.appendChild(time); wrap.appendChild(msg);
+            list.appendChild(wrap);
+        });
         list.scrollTop = list.scrollHeight;
     }
 
-    // auto scroll to bottom on load
-    list.scrollTop = list.scrollHeight;
-
-    send.addEventListener('click', function(){
-        const v = input.value.trim();
-        if(!v) return;
-        appendMessage(v, true);
-        input.value = '';
-        // mock reply
-        setTimeout(()=> appendMessage('Terima kasih, saya akan bantu.', false), 900);
-    });
-
-    // allow Enter to send (Shift+Enter for newline)
-    input.addEventListener('keydown', function(e){
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            send.click();
+    async function fetchMessages(){
+        if (!sessionId) return;
+        try {
+            const res = await fetch('index.php?p=api_chat&action=fetch&session_id=' + sessionId);
+            const j = await res.json();
+            if (j.success) renderMessages(j.messages || []);
+        } catch(e) {
+            console.error('fetchMessages', e);
         }
-    });
+    }
+
+    async function sendMessage(text){
+        if (!sessionId) return;
+        try {
+            const fd = new FormData();
+            fd.append('action','send');
+            fd.append('session_id', sessionId);
+            fd.append('message', text);
+            const res = await fetch('index.php?p=api_chat', {method:'POST', body:fd});
+            const j = await res.json();
+            if (j.success) {
+                if (j.message) {
+                    // append returned message (contains created_at)
+                    const m = j.message;
+                    const wrap = document.createElement('div');
+                    wrap.className = 'mb-4 text-right';
+                    const time = document.createElement('div'); time.className='msg-time'; time.innerText = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                    const msg = document.createElement('div'); msg.className = 'bubble-right'; msg.innerText = m.message;
+                    wrap.appendChild(time); wrap.appendChild(msg);
+                    list.appendChild(wrap);
+                    list.scrollTop = list.scrollHeight;
+                } else {
+                    // fallback: refetch
+                    fetchMessages();
+                }
+            }
+        } catch(e) { console.error('sendMessage', e); }
+    }
+
+    // initial load and polling
+    fetchMessages();
+    const poll = setInterval(fetchMessages, 3000);
+
+    if (send && input) {
+        send.addEventListener('click', function(){
+            const v = input.value.trim();
+            if (!v) return;
+            sendMessage(v);
+            input.value = '';
+        });
+
+        input.addEventListener('keydown', function(e){
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send.click();
+            }
+        });
+    }
 });
 </script>
 

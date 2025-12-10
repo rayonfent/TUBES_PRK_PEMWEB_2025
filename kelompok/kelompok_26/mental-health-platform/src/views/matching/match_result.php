@@ -40,38 +40,38 @@ if ($survey['q3'] == 1) $direct_score++; else $gentle_score++;
 $logical = ($survey['q4'] == 1);
 $emotional = ($survey['q4'] == 2);
 
-// Determine Communication Style Label
+// Determine Communication Style Label (Indonesian)
 if ($direct_score >= 2) {
-    $comm_label = "Direct Communicator";
+    $comm_label = "Komunikator Tegas";
     $comm_desc = "Kamu lebih nyaman dengan komunikasi yang tegas, jelas, dan langsung ke inti masalah.";
 } elseif ($gentle_score >= 2) {
-    $comm_label = "Empathic Communicator";
+    $comm_label = "Komunikator Empatik";
     $comm_desc = "Kamu lebih nyaman dengan komunikasi lembut, hangat, dan penuh empati.";
 } else {
-    $comm_label = "Balanced Communicator";
+    $comm_label = "Komunikator Seimbang";
     $comm_desc = "Kamu fleksibel: bisa nyaman dengan gaya tegas maupun lembut.";
 }
 
-// Emotional Thinking Style
+// Emotional Thinking Style (Indonesian)
 if ($logical) {
-    $emo_label = "Logical Thinker";
-    $emo_desc = "Pendekatanmu lebih rasional, analitis, dan fokus solusi.";
+    $emo_label = "Pemikir Logis";
+    $emo_desc = "Pendekatanmu lebih rasional, analitis, dan fokus pada solusi.";
 } else {
-    $emo_label = "Emotional Feeler";
+    $emo_label = "Perasa Emosional";
     $emo_desc = "Pendekatanmu lebih emosional, ekspresif, dan intuitif.";
 }
 
-// Final Personality Type Combination
+// Final Personality Type Combination (Indonesian)
 if ($direct_score >= 2 && $logical) {
-    $final_type = "Analytical Realist";
+    $final_type = "Realistis Analitis";
 } elseif ($direct_score >= 2 && $emotional) {
-    $final_type = "Straightforward Feeler";
+    $final_type = "Perasa Terbuka";
 } elseif ($gentle_score >= 2 && $logical) {
-    $final_type = "Calm Rationalist";
+    $final_type = "Rasional Tenang";
 } elseif ($gentle_score >= 2 && $emotional) {
-    $final_type = "Empathic Listener";
+    $final_type = "Pendengar Empatik";
 } else {
-    $final_type = "Adaptive Communicator";
+    $final_type = "Komunikator Adaptif";
 }
 
 
@@ -106,36 +106,15 @@ usort($results, function($a, $b) {
 });
 
 // --- LOGIC FROM ORIGINAL match_result.php END ---
-
-// Tentukan tautan yang aktif untuk sidebar
-$currentPage = 'match'; 
 ?>
 
 <div class="min-h-screen" style="background-color: #f5f5f5;">
     
     <div class="flex min-h-screen">
 
-        <aside style="width:260px; background: linear-gradient(180deg,#2fb39a,#1fa08e);" class="hidden md:flex flex-col p-6 text-white shadow-lg">
-            
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">AP</div>
-                <div>
-                    <div class="font-bold text-lg">Halo, <?= htmlspecialchars(explode(' ', $user['name'] ?? $user['email'])[0]) ?></div>
-                    <div class="text-sm opacity-90">Pengguna</div>
-                </div>
-            </div>
-            
-            <nav class="flex-1">
-                <a href="index.php?p=user_dashboard" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Beranda</a>
-                <a href="index.php?p=match" class="block px-4 py-3 rounded-lg mb-2 font-semibold bg-white text-[#2fb39a] shadow-md">Temukan Konselor</a>
-                <a href="index.php?p=chat" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Chat</a>
-                <a href="index.php?p=profile" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Profil & Preferensi</a>
-                <a href="index.php?p=user_settings" class="block px-4 py-3 rounded-lg mb-2 font-semibold hover:bg-white/5">Pengaturan</a>
-            </nav>
-            
-            <a href="index.php?p=logout" class="mt-4 inline-block px-4 py-3 bg-white/10 rounded-lg text-center hover:bg-white/20">Logout</a>
-        </aside>
-        <main class="flex-1 px-6 py-8" style="background-color: #f5f5f5;">
+        <?php $current_page = 'match'; include dirname(__DIR__) . '/partials/sidebar.php'; ?>
+
+        <main class="flex-1 px-6 py-8" style="background-color: #f5f5f5; margin-left:260px;">
             <div class="max-w-7xl mx-auto relative z-10 transition-colors duration-300">
         
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8">

@@ -1,3 +1,4 @@
+-- Active: 1758177509499@@127.0.0.1@3306@mental_health_platform
 -- Run the following SQL after you generate a bcrypt/hash with PHP's password_hash
 -- Example steps:
 -- 1) In terminal run: php -r "echo password_hash('admin', PASSWORD_DEFAULT) . PHP_EOL;"

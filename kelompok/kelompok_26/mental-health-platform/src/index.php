@@ -1,4 +1,5 @@
 <?php
+ob_start();
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 session_start();
@@ -374,6 +375,7 @@ if (isset($_GET['p'])) {
             session_unset();
             session_destroy();
             header('Location: index.php?p=home');
+            // load_view("auth/login");
             exit;
 
         case 'survey':
@@ -453,6 +455,7 @@ if (isset($_GET['p'])) {
     }
 
 }
+ ob_end_flush();
 ?>
 
 <!-- DARK MODE TOGGLE & INITIALIZATION -->

@@ -36,13 +36,8 @@ if ($res) {
 }
 
 // === Fetch subscription/payment status (simple) ===
-// payments table assumed: payment_id, user_id, status ('paid','due','trial'), plan, expires_at
+// Payment feature coming soon
 $payment = null;
-$stmt = $conn->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_id DESC LIMIT 1");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$res = $stmt->get_result();
-if ($res && $res->num_rows) $payment = $res->fetch_assoc();
 
 // === Quick stats ===
 // total sessions

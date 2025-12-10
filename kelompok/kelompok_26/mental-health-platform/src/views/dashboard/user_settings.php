@@ -4,6 +4,7 @@
 
 require_once dirname(__DIR__, 2) . "/config/database.php";
 require_once dirname(__DIR__, 2) . "/models/User.php";
+require_once dirname(__DIR__, 2) . "/models/UserPreference.php";
 
 if (!isset($_SESSION['user'])) {
     echo "<script>window.location='index.php?p=login';</script>";
@@ -14,6 +15,7 @@ $user = $_SESSION['user'];
 $user_id = $user['user_id'] ?? $user['id'] ?? null;
 
 $userModel = new User($conn);
+$prefModel = new UserPreference($conn);
 
 // Refresh user data from database to get latest profile picture
 $freshUser = $userModel->getUserById($user_id);
@@ -21,6 +23,11 @@ if ($freshUser) {
     $user = array_merge($user, $freshUser);
     $_SESSION['user'] = $user;
 }
+
+// Ambil preferensi user (jika ada)
+$prefs = $prefModel->getPreferenceByUserId($user_id);
+$pref_comm = $prefs['communication_pref'] ?? 'B';
+$pref_approach = $prefs['approach_pref'] ?? 'B';
 
 // Get flash messages
 $success_msg = $_SESSION['success'] ?? null;
@@ -65,14 +72,17 @@ unset($_SESSION['success'], $_SESSION['error']);
         <!-- Settings Navigation Tabs -->
         <div class="mb-8 bg-white rounded-xl soft-shadow overflow-hidden">
             <div class="flex flex-wrap border-b border-gray-200">
-                <button onclick="showTab('tab-profile')" class="settings-tab active px-6 py-4 font-semibold text-[#17252A] border-b-2 border-[#3AAFA9] whitespace-nowrap">
+                <button onclick="showTab('tab-profile', event)" class="settings-tab active px-6 py-4 font-semibold text-[#17252A] border-b-2 border-[#3AAFA9] whitespace-nowrap">
                     Edit Profil
                 </button>
-                <button onclick="showTab('tab-photo')" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
+                <button onclick="showTab('tab-photo', event)" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
                     Foto Profil
                 </button>
-                <button onclick="showTab('tab-password')" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
+                <button onclick="showTab('tab-password', event)" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
                     Ubah Password
+                </button>
+                <button onclick="showTab('tab-preferences', event)" class="settings-tab px-6 py-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-[#3AAFA9] whitespace-nowrap">
+                    Preferensi Konselor
                 </button>
             </div>
 
@@ -199,6 +209,41 @@ unset($_SESSION['success'], $_SESSION['error']);
                     </div>
                 </div>
 
+                <!-- Tab 4: Preferences -->
+                <div id="tab-preferences" class="settings-content hidden">
+                    <h2 class="text-2xl font-bold text-[#17252A] mb-6">Preferensi Gaya Konselor</h2>
+
+                    <div class="max-w-2xl space-y-6">
+                        <div class="bg-[#F7FBFB] p-4 rounded-lg border border-gray-200">
+                            <p class="text-sm text-gray-600">Sesuaikan gaya komunikasi dan pendekatan yang kamu sukai saat konseling.</p>
+                        </div>
+
+                        <form method="POST" action="index.php?p=update_preferences" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-bold text-[#17252A] mb-3">Gaya Komunikasi Konselor</label>
+                                <select name="communication_pref" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AAFA9]">
+                                    <option value="S" <?= $pref_comm === 'S' ? 'selected' : '' ?>>Tegas / Straightforward</option>
+                                    <option value="G" <?= $pref_comm === 'G' ? 'selected' : '' ?>>Lembut / Gentle</option>
+                                    <option value="B" <?= $pref_comm === 'B' ? 'selected' : '' ?>>Seimbang</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-[#17252A] mb-3">Pendekatan Konseling</label>
+                                <select name="approach_pref" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AAFA9]">
+                                    <option value="O" <?= $pref_approach === 'O' ? 'selected' : '' ?>>Logis / Rasional</option>
+                                    <option value="D" <?= $pref_approach === 'D' ? 'selected' : '' ?>>Empatik / Suportif</option>
+                                    <option value="B" <?= $pref_approach === 'B' ? 'selected' : '' ?>>Seimbang</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="w-full px-6 py-3 bg-[#3AAFA9] text-white rounded-lg hover:bg-[#2B8E89] font-bold transition">
+                                Simpan Preferensi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -291,7 +336,7 @@ html.dark-mode .bg-yellow-50 p {
 </style>
 
 <script>
-function showTab(tabId) {
+function showTab(tabId, evt) {
     // Hide all tabs
     const tabs = document.querySelectorAll('.settings-content');
     tabs.forEach(tab => tab.classList.add('hidden'));
@@ -307,7 +352,9 @@ function showTab(tabId) {
     }
     
     // Set active state for clicked button
-    event.target.classList.add('active');
+    if (evt && evt.target) {
+        evt.target.classList.add('active');
+    }
 }
 </script>
 ?>

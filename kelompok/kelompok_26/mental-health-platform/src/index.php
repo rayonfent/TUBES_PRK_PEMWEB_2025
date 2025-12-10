@@ -463,6 +463,12 @@ if (isset($_GET['p'])) {
             $userController = new UserController($conn);
             $userController->changePassword();
             break;
+
+        case 'update_preferences':
+            require_once _DIR_ . '/controllers/UserController.php';
+            $userController = new UserController($conn);
+            $userController->updatePreferences();
+            break;
         
         case 'user_settings':
             load_view("dashboard/user_settings");

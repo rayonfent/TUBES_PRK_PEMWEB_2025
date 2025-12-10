@@ -16,6 +16,23 @@ $konselor_id = $konselor['konselor_id'] ?? $konselor['id'] ?? null;
 $success_msg = $_SESSION['success'] ?? null;
 $error_msg = $_SESSION['error'] ?? null;
 unset($_SESSION['success'], $_SESSION['error']);
+
+// Ambil preferensi konselor (komunikasi & pendekatan)
+$pref_comm = 'B';
+$pref_approach = 'B';
+$stmt = $conn->prepare("SELECT communication_style, approach_style FROM konselor_profile WHERE konselor_id = ? LIMIT 1");
+if ($stmt) {
+    $stmt->bind_param('i', $konselor_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res && $res->num_rows === 1) {
+        $row = $res->fetch_assoc();
+        $pref_comm = $row['communication_style'] ?? 'B';
+        $pref_approach = $row['approach_style'] ?? 'B';
+    }
+    $stmt->close();
+}
+
 ?>
 
 <div class="min-h-screen" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: visible;">
@@ -78,8 +95,11 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);">Informasi Profil</h2>
 
                         <div class="flex items-center gap-4 mb-8">
-                            <img src="<?= isset($konselor['profile_picture']) && $konselor['profile_picture'] ? "../uploads/konselor/".htmlspecialchars($konselor['profile_picture']) : 'https://via.placeholder.com/100x100?text=Konselor' ?>"
-                                 alt="avatar" class="w-24 h-24 object-cover rounded-xl shadow-sm">
+                            <div class="relative w-24 h-24 rounded-xl overflow-hidden shadow-sm bg-white" style="flex-shrink:0;">
+                                <img src="<?= isset($konselor['profile_picture']) && $konselor['profile_picture'] ? "../uploads/konselor/".htmlspecialchars($konselor['profile_picture']) : 'https://via.placeholder.com/100x100?text=Konselor' ?>"
+                                     alt="avatar" class="w-full h-full object-cover">
+                                <button type="button" onclick="openPhotoModal()" class="absolute bottom-1 right-1 bg-[#3AAFA9] text-white w-8 h-8 rounded-full flex items-center justify-center shadow" title="Ganti foto">✎</button>
+                            </div>
                             <div>
                                 <h3 style="color: var(--text-primary); font-weight: 600; font-size: 16px;"><?= htmlspecialchars($konselor['name']) ?></h3>
                                 <p style="color: var(--text-secondary); font-size: 14px;"><?= htmlspecialchars($konselor['email']) ?></p>
@@ -117,6 +137,32 @@ unset($_SESSION['success'], $_SESSION['error']);
 
                             <button type="submit" class="w-full mt-6 px-4 py-2 bg-[#3AAFA9] text-white rounded-lg font-semibold">Simpan Perubahan</button>
                         </form>
+
+                        <!-- Preferensi Gaya Konseling -->
+                        <div class="mt-10 border-t pt-6" style="border-color: var(--border-color);">
+                            <h3 class="text-lg font-semibold mb-3" style="color: var(--text-primary);">Preferensi Gaya Konseling</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Gaya Komunikasi</label>
+                                    <select id="input_comm_style" class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                                        <option value="S" <?= $pref_comm === 'S' ? 'selected' : '' ?>>Tegas / Straightforward</option>
+                                        <option value="G" <?= $pref_comm === 'G' ? 'selected' : '' ?>>Lembut / Gentle</option>
+                                        <option value="B" <?= $pref_comm === 'B' ? 'selected' : '' ?>>Seimbang</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Pendekatan</label>
+                                    <select id="input_approach_style" class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                                        <option value="O" <?= $pref_approach === 'O' ? 'selected' : '' ?>>Logis / Rasional</option>
+                                        <option value="D" <?= $pref_approach === 'D' ? 'selected' : '' ?>>Empatik / Suportif</option>
+                                        <option value="B" <?= $pref_approach === 'B' ? 'selected' : '' ?>>Seimbang</option>
+                                    </select>
+                                </div>
+
+                                <button type="button" onclick="submitPreferences()" class="w-full px-4 py-2 bg-[#3AAFA9] text-white rounded-lg font-semibold">Simpan Preferensi</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Keamanan Section -->
@@ -124,6 +170,11 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);">Keamanan Akun</h2>
 
                         <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Password Lama</label>
+                                <input type="password" id="input_old_password" placeholder="Masukkan password sekarang" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                            </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Password Baru</label>
                                 <input type="password" id="input_password" placeholder="Kosongkan jika tidak ingin mengubah" 
@@ -142,7 +193,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                                 </p>
                             </div>
 
-                            <button type="button" onclick="submitProfileForm()" class="w-full mt-6 px-4 py-2 bg-[#3AAFA9] text-white rounded-lg font-semibold">Perbarui Keamanan</button>
+                            <button type="button" onclick="changePassword()" class="w-full mt-6 px-4 py-2 bg-[#3AAFA9] text-white rounded-lg font-semibold">Perbarui Keamanan</button>
                         </div>
 
                         <!-- Danger Zone -->
@@ -158,6 +209,21 @@ unset($_SESSION['success'], $_SESSION['error']);
         </main>
     </div>
 
+</div>
+
+<!-- Modal Upload Foto -->
+<div id="photoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1100;" class="flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+        <h3 class="text-lg font-bold mb-4">Ganti Foto Profil</h3>
+        <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center mb-4">
+            <input type="file" id="input_photo" accept="image/*" class="w-full" />
+            <p class="text-xs text-gray-500 mt-2">Format JPG/PNG/GIF, maks 2MB.</p>
+        </div>
+        <div class="flex gap-3 justify-end">
+            <button type="button" onclick="closePhotoModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">Batal</button>
+            <button type="button" onclick="uploadPhoto()" class="px-4 py-2 bg-[#3AAFA9] text-white rounded-lg">Upload</button>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -252,7 +318,12 @@ function submitProfileForm() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(async response => {
+        const text = await response.text();
+        let data;
+        try { data = JSON.parse(text); } catch (e) { throw new Error(text || 'Invalid response'); }
+        return data;
+    })
     .then(data => {
         if (data.success) {
             alert('Profil berhasil diperbarui!');
@@ -264,6 +335,128 @@ function submitProfileForm() {
     .catch(error => {
         console.error('Error:', error);
         alert('Terjadi kesalahan saat mengirim data.');
+    });
+}
+
+// Upload foto profil konselor
+function uploadPhoto() {
+    const fileInput = document.getElementById('input_photo');
+    if (!fileInput || !fileInput.files.length) {
+        alert('Pilih foto terlebih dahulu');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'upload_photo');
+    formData.append('profile_picture', fileInput.files[0]);
+
+    fetch('index.php?p=handle_konselor', {
+        method: 'POST',
+        body: formData
+    })
+    .then(async r => {
+        const t = await r.text();
+        try { return JSON.parse(t); } catch(e) { throw new Error(t || 'Invalid response'); }
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Foto berhasil diperbarui');
+            location.reload();
+        } else {
+            alert(data.message || 'Gagal mengupload foto');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Gagal mengupload foto');
+    });
+}
+
+function openPhotoModal() {
+    document.getElementById('photoModal').style.display = 'flex';
+}
+function closePhotoModal() {
+    document.getElementById('photoModal').style.display = 'none';
+    const input = document.getElementById('input_photo');
+    if (input) input.value = '';
+}
+
+// Simpan preferensi gaya konseling
+function submitPreferences() {
+    const comm = document.getElementById('input_comm_style').value;
+    const approach = document.getElementById('input_approach_style').value;
+
+    const formData = new FormData();
+    formData.append('action', 'update_preferences');
+    formData.append('communication_style', comm);
+    formData.append('approach_style', approach);
+
+    fetch('index.php?p=handle_konselor', {
+        method: 'POST',
+        body: formData
+    })
+    .then(async r => {
+        const t = await r.text();
+        try { return JSON.parse(t); } catch(e) { throw new Error(t || 'Invalid response'); }
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Preferensi tersimpan');
+        } else {
+            alert(data.message || 'Gagal menyimpan preferensi');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Terjadi kesalahan saat menyimpan preferensi');
+    });
+}
+
+// Change password with old password confirmation
+function changePassword() {
+    const oldPwd = document.getElementById('input_old_password').value.trim();
+    const newPwd = document.getElementById('input_password').value.trim();
+    const confirmPwd = document.getElementById('input_password_confirm').value.trim();
+
+    if (!oldPwd || !newPwd || !confirmPwd) {
+        alert('Semua field password wajib diisi');
+        return;
+    }
+    if (newPwd.length < 8) {
+        alert('Password baru minimal 8 karakter');
+        return;
+    }
+    if (newPwd !== confirmPwd) {
+        alert('Konfirmasi password tidak cocok');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'change_password');
+    formData.append('old_password', oldPwd);
+    formData.append('new_password', newPwd);
+
+    fetch('index.php?p=handle_konselor', {
+        method: 'POST',
+        body: formData
+    })
+    .then(async r => {
+        const t = await r.text();
+        try { return JSON.parse(t); } catch(e) { throw new Error(t || 'Invalid response'); }
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Password berhasil diubah');
+            document.getElementById('input_old_password').value = '';
+            document.getElementById('input_password').value = '';
+            document.getElementById('input_password_confirm').value = '';
+        } else {
+            alert(data.message || 'Gagal mengganti password');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Terjadi kesalahan saat mengganti password: ' + err.message);
     });
 }
 </script>

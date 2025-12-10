@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/UserPreference.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -11,10 +12,12 @@ if (session_status() === PHP_SESSION_NONE) {
 class UserController {
     protected $db;
     protected $userModel;
+    protected $prefModel;
     
     public function __construct($db) {
         $this->db = $db;
         $this->userModel = new User($db);
+        $this->prefModel = new UserPreference($db);
     }
     
     /**
@@ -218,6 +221,67 @@ class UserController {
             $_SESSION['error'] = $result['message'];
         }
         
+        header('Location: ?p=user_settings');
+        exit;
+    }
+
+    /**
+     * Update manual preferensi komunikasi & pendekatan konselor
+     */
+    public function updatePreferences() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error'] = 'Invalid request method';
+            header('Location: ?p=user_settings');
+            exit;
+        }
+
+        if (!isset($_SESSION['user'])) {
+            $_SESSION['error'] = 'Anda harus login terlebih dahulu';
+            header('Location: ?p=login');
+            exit;
+        }
+
+        $userId = $_SESSION['user']['user_id'];
+        $comm = $_POST['communication_pref'] ?? '';
+        $approach = $_POST['approach_pref'] ?? '';
+
+        $validComm = ['S','G','B'];
+        $validApproach = ['O','D','B'];
+        if (!in_array($comm, $validComm, true) || !in_array($approach, $validApproach, true)) {
+            $_SESSION['error'] = 'Pilihan preferensi tidak valid';
+            header('Location: ?p=user_settings');
+            exit;
+        }
+
+        // upsert ke tabel user_preferences
+        $stmt = $this->db->prepare("SELECT pref_id FROM user_preferences WHERE user_id = ? LIMIT 1");
+        if ($stmt) {
+            $stmt->bind_param('i', $userId);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $exists = $res && $res->num_rows === 1;
+            $stmt->close();
+        } else {
+            $_SESSION['error'] = 'Gagal memproses preferensi';
+            header('Location: ?p=user_settings');
+            exit;
+        }
+
+        if ($exists) {
+            $stmt = $this->db->prepare("UPDATE user_preferences SET communication_pref = ?, approach_pref = ?, created_at = NOW() WHERE user_id = ?");
+            $stmt->bind_param('ssi', $comm, $approach, $userId);
+        } else {
+            $stmt = $this->db->prepare("INSERT INTO user_preferences (user_id, communication_pref, approach_pref) VALUES (?,?,?)");
+            $stmt->bind_param('iss', $userId, $comm, $approach);
+        }
+
+        if ($stmt && $stmt->execute()) {
+            $_SESSION['success'] = 'Preferensi berhasil disimpan';
+            $stmt->close();
+        } else {
+            $_SESSION['error'] = 'Gagal menyimpan preferensi';
+        }
+
         header('Location: ?p=user_settings');
         exit;
     }

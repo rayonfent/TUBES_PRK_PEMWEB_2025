@@ -3,8 +3,13 @@
 // Dashboard User - Astral Psychologist
 
 // Pastikan koneksi database tersedia
+<<<<<<< HEAD
 require_once dirname(_DIR_, 2) . "/config/database.php";
 require_once dirname(_DIR_, 2) . "/models/User.php";
+=======
+require_once dirname(__DIR__, 2) . "/config/database.php";
+require_once dirname(__DIR__, 2) . "/models/User.php";
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
 
 if (!isset($_SESSION['user'])) {
     echo "<script>window.location='index.php?p=login';</script>";
@@ -51,6 +56,7 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
 
 // === Fetch recent chat sessions (last 10) ===
 // sessions table assumed: session_id, user_id, konselor_id, status ('active','closed','trial'), started_at, ended_at
+<<<<<<< HEAD
 $sessions = [];
         $stmt = $conn->prepare("SELECT s.*, k.name AS konselor_name, k.profile_picture AS konselor_pic
             FROM chat_session s
@@ -69,11 +75,39 @@ $payment = null;
 $tableCheckResult = $conn->query("SHOW TABLES LIKE 'payments'");
 if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
     $stmt = $conn->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_id DESC LIMIT 1");
+=======
+$tableCheckResult = $conn->query("SHOW TABLES LIKE 'chat_session'");
+if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
+    $stmt = $conn->prepare("SELECT s.*, k.name AS konselor_name, k.profile_picture AS konselor_pic
+        FROM chat_session s
+        LEFT JOIN konselor k ON k.konselor_id = s.konselor_id
+        WHERE s.user_id = ? ORDER BY s.started_at DESC LIMIT 10");
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
     if ($stmt) {
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $res = $stmt->get_result();
+<<<<<<< HEAD
         if ($res && $res->num_rows) $payment = $res->fetch_assoc();
+=======
+        if ($res) {
+            while ($row = $res->fetch_assoc()) $sessions[] = $row;
+            // determine upcoming session (closest future or active)
+            usort($sessions, function($a,$b){
+                $ta = strtotime($a['started_at'] ?? 0);
+                $tb = strtotime($b['started_at'] ?? 0);
+                return $ta <=> $tb;
+            });
+            $now = time();
+            foreach($sessions as $scheck){
+                $st = strtotime($scheck['started_at'] ?? 0);
+                if (($scheck['status']??'') === 'active' || ($scheck['status']??'') === 'trial' || $st > $now) {
+                    $upcoming_session = $scheck;
+                    break;
+                }
+            }
+        }
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
     }
 }
 
@@ -96,7 +130,11 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
     <!-- Layout: Sidebar + Main -->
     <div class="flex min-h-screen">
 
+<<<<<<< HEAD
         <?php $current_page = 'user_dashboard'; include dirname(_DIR_) . '/partials/sidebar.php'; ?>
+=======
+        <?php $current_page = 'user_dashboard'; include dirname(__DIR__) . '/partials/sidebar.php'; ?>
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
 
         <!-- MAIN CONTENT -->
         <main class="flex-1 px-6 py-8" style="margin-left:260px;">
@@ -224,7 +262,11 @@ if ($tableCheckResult && $tableCheckResult->num_rows > 0) {
                                     <button onclick="confirmDeleteSession(<?= intval($s['session_id']) ?>)" 
                                             class="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition" 
                                             title="Hapus riwayat sesi">
+<<<<<<< HEAD
                                         🗑
+=======
+                                        🗑️
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
                                     </button>
                                 </div>
                             </div>

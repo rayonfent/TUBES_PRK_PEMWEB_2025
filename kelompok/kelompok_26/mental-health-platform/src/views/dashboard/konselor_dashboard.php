@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 // src/views/dashboard/konselor_dashboard.php
 // Dashboard Konselor - Astral Psychologist
@@ -522,3 +523,22 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 });
 </script>
+=======
+<!-- src/views/dashboard/konselor_dashboard.php -->
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isset($_SESSION['konselor'])) { header('Location: index.php?p=login'); exit; }
+$k = $_SESSION['konselor'];
+?>
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Konselor Dashboard</title></head>
+<body>
+<h2>Konselor Dashboard</h2>
+<p>Hi <?=htmlspecialchars($k['name'])?></p>
+<ul>
+    <li><a href="controllers/handle_auth.php?action=logout">Logout</a></li>
+</ul>
+</body>
+</html>
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b

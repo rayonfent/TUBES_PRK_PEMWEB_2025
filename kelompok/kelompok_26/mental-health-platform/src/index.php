@@ -6,7 +6,11 @@ session_start();
 $p = $_GET['p'] ?? 'home';
 
 function load_view($path) {
+<<<<<<< HEAD
     $file = _DIR_ . "/views/$path.php";
+=======
+    $file = __DIR__ . "/views/$path.php";
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
     if (file_exists($file)) include $file;
 }
 ?>
@@ -350,6 +354,7 @@ if (isset($_GET['p'])) {
     switch ($_GET['p']) {
 
        case 'user_dashboard':
+<<<<<<< HEAD
             include _DIR_ . "/views/dashboard/user_dashboard.php";
             break;
 
@@ -359,6 +364,17 @@ if (isset($_GET['p'])) {
 
         case 'admin_dashboard':
             include _DIR_ . "/views/dashboard/admin_dashboard.php";
+=======
+            include __DIR__ . "/views/dashboard/user_dashboard.php";
+            break;
+
+        case 'konselor_dashboard':
+            include __DIR__ . "/views/dashboard/konselor_dashboard.php";
+            break;
+
+        case 'admin_dashboard':
+            include __DIR__ . "/views/dashboard/admin_dashboard.php";
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
             break;
 
         case 'login':
@@ -385,16 +401,25 @@ if (isset($_GET['p'])) {
             break;
 
         case 'api_chat':
+<<<<<<< HEAD
             require_once _DIR_ . '/controllers/handle_chat.php';
             break;
 
         case 'delete_session':
             require_once _DIR_ . '/controllers/handle_session.php';
+=======
+            require_once __DIR__ . '/controllers/handle_chat.php';
+            break;
+
+        case 'delete_session':
+            require_once __DIR__ . '/controllers/handle_session.php';
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
             break;
 
         case 'match':
             load_view("matching/match_result");
             break;
+<<<<<<< HEAD
 
         case 'handle_konselor':
             require_once _DIR_ . '/controllers/handle_konselor.php';
@@ -410,18 +435,31 @@ if (isset($_GET['p'])) {
         
         case 'update_profile':
             require_once _DIR_ . '/controllers/UserController.php';
+=======
+        
+        case 'update_profile':
+            require_once __DIR__ . '/controllers/UserController.php';
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
             $userController = new UserController($conn);
             $userController->updateProfile();
             break;
         
         case 'upload_profile_picture':
+<<<<<<< HEAD
             require_once _DIR_ . '/controllers/UserController.php';
+=======
+            require_once __DIR__ . '/controllers/UserController.php';
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
             $userController = new UserController($conn);
             $userController->uploadProfilePicture();
             break;
         
         case 'change_password':
+<<<<<<< HEAD
             require_once _DIR_ . '/controllers/UserController.php';
+=======
+            require_once __DIR__ . '/controllers/UserController.php';
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
             $userController = new UserController($conn);
             $userController->changePassword();
             break;
@@ -440,7 +478,11 @@ if (isset($_GET['p'])) {
 
         // BARU: Controller untuk Upload Bukti Pembayaran
         case 'upload_payment_proof':
+<<<<<<< HEAD
             require_once _DIR_ . '/controllers/PaymentController.php';
+=======
+            require_once __DIR__ . '/controllers/PaymentController.php';
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
             $paymentController = new PaymentController($conn);
             $paymentController->uploadProof();
             break;
@@ -485,7 +527,11 @@ function toggleDarkMode() {
     // Update button icon if it exists
     const darkModeBtn = document.getElementById('darkModeToggle');
     if (darkModeBtn) {
+<<<<<<< HEAD
         darkModeBtn.textContent = isDarkMode ? '☀' : '🌙';
+=======
+        darkModeBtn.textContent = isDarkMode ? '☀️' : '🌙';
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b
     }
 }
 
@@ -514,4 +560,8 @@ if (viewport) {
 </script>
 
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 7ea37de6a2d1a7443e5e364d2a1a64ce5a04011b

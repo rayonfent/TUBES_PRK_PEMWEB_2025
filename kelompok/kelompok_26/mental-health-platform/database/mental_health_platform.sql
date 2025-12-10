@@ -1,3 +1,4 @@
+-- Active: 1758177509499@@127.0.0.1@3306@mental_health_platform
 -- phpMyAdmin SQL Dump
 -- version 5.2.3
 -- https://www.phpmyadmin.net/
@@ -6,12 +7,8 @@
 -- Generation Time: Dec 03, 2025 at 02:08 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
-SHOW DATABASES;
-
-CREATE DATABASE mental_health_platform;
 
 USE mental_health_platform;
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";

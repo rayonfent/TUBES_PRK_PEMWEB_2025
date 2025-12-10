@@ -1,0 +1,26 @@
+{
+  "project": "mental-health-platform",
+  "generated": "2025-12-01T00:00:00Z",
+  "files": [
+    {"path": "index.php", "type": "entry", "desc": "Application entry point / router"},
+    {"path": "config/database.php", "type": "config", "desc": "DB connection"},
+    {"path": "controllers/AuthController.php", "type": "controller", "desc": "Authentication handlers"},
+    {"path": "controllers/ChatController.php", "type": "controller", "desc": "Chat logic and handlers"},
+    {"path": "controllers/MatchingController.php", "type": "controller", "desc": "Matching logic"},
+    {"path": "controllers/SurveyController.php", "type": "controller", "desc": "Survey flow and handlers"},
+    {"path": "controllers/handle_auth.php", "type": "script", "desc": "Form handling for auth"},
+    {"path": "controllers/handle_chat.php", "type": "script", "desc": "Chat form / ajax endpoints"},
+    {"path": "helpers/auth.php", "type": "helper", "desc": "Auth helper utilities"},
+    {"path": "helpers/upload.php", "type": "helper", "desc": "File upload helper"},
+    {"path": "models/User.php", "type": "model", "desc": "User model"},
+    {"path": "models/konselor.php", "type": "model", "desc": "Konselor (counselor) model"},
+    {"path": "models/KonselorProfile.php", "type": "model", "desc": "Konselor profile model"},
+    {"path": "models/ChatMessage.php", "type": "model", "desc": "Chat messages"},
+    {"path": "views/auth/login.php", "type": "view", "desc": "Sign-in page"},
+    {"path": "views/auth/register.php", "type": "view", "desc": "Registration page"},
+    {"path": "views/chat/chat_room.php", "type": "view", "desc": "Chat UI"},
+    {"path": "views/dashboard/user_dashboard.php", "type": "view", "desc": "User dashboard"},
+    {"path": "views/dashboard/konselor_dashboard.php", "type": "view", "desc": "Konselor dashboard"},
+    {"path": "database/mental_health_platform.sql", "type": "database", "desc": "DB schema + sample data"}
+  ]
+}

@@ -2,7 +2,9 @@
 // src/views/profile/user_profile.php
 // User Profile Page - Astral Psychologist (FINALIZED FOR VERTICAL LAYOUT & CONSISTENT CARDS)
 
-require_once dirname(__DIR__, 2) . "/config/database.php";
+global $conn;
+
+// Require User model
 require_once dirname(__DIR__, 2) . "/models/User.php";
 
 if (!isset($_SESSION['user'])) {

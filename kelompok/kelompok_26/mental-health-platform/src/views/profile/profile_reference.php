@@ -2,7 +2,9 @@
 // src/views/profile/profile_reference.php
 // Reference user profile page adapted from design
 
-require_once dirname(__DIR__, 2) . "/config/database.php";
+global $conn;
+
+// Require User model
 require_once dirname(__DIR__, 2) . "/models/User.php";
 
 if (!isset($_SESSION['user'])) {

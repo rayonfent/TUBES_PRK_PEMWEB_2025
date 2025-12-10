@@ -2,8 +2,7 @@
 // src/views/matching/match_result.php
 // Halaman Hasil Kecocokan - Disesuaikan dengan Layout Dashboard
 
-require_once dirname(__DIR__, 2) . "/config/database.php";
-require_once dirname(__DIR__, 2) . "/models/User.php";
+global $conn;
 
 if (!isset($_SESSION['user'])) {
     echo "<script>window.location='index.php?p=login';</script>";

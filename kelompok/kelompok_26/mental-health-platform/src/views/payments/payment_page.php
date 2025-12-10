@@ -3,8 +3,7 @@
 // ... (Bagian PHP tidak berubah)
 // Pastikan file ini memiliki akses ke Tailwind CSS framework
 
-require_once dirname(__DIR__, 2) . "/config/database.php";
-require_once dirname(__DIR__, 2) . "/models/User.php";
+global $conn;
 
 if (!isset($_SESSION['user'])) {
     echo "<script>window.location='index.php?p=login';</script>";

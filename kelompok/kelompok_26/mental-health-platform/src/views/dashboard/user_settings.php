@@ -2,7 +2,9 @@
 // src/views/dashboard/user_settings.php
 // User Settings Page - Astral Psychologist
 
-require_once dirname(__DIR__, 2) . "/config/database.php";
+global $conn;
+
+// Require User model
 require_once dirname(__DIR__, 2) . "/models/User.php";
 
 if (!isset($_SESSION['user'])) {

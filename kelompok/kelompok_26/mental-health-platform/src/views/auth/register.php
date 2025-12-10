@@ -1,12 +1,14 @@
 <?php
 // views/auth/register.php
 
+// Gunakan $conn dari index.php
+global $conn;
+
 $reg_error = "";
 $reg_success = "";
 
 // Jika user submit form
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    require_once dirname(__DIR__, 2) . "/config/database.php";
 
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);

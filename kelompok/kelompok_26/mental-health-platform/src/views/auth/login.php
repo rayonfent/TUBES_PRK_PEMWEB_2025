@@ -1,13 +1,14 @@
 <?php
 // views/auth/login.php
 
+// Gunakan $conn dari index.php
+global $conn;
+
 // default tidak ada error
 $login_error = "";
 
 // jika tombol login ditekan
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    require_once dirname(__DIR__, 2) . "/config/database.php";
 
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);

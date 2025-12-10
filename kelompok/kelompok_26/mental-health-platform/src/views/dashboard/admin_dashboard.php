@@ -1,6 +1,6 @@
 <?php
 // Admin Dashboard
-require_once dirname(__DIR__, 2) . "/config/database.php";
+global $conn;
 
 if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
     echo "<script>window.location='index.php?p=login';</script>";

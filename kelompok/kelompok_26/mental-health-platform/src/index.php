@@ -3,10 +3,13 @@ ini_set('display_errors',1);
 error_reporting(E_ALL);
 session_start();
 
+define('_DIR_', __DIR__);
+require_once _DIR_ . '/config/database.php';
+
 $p = $_GET['p'] ?? 'home';
 
-function load_view($path) {
-    $file = __DIR__ . "/views/$path.php";
+function load_view($path, $conn = null) {
+    $file = _DIR_ . "/views/$path.php";
     if (file_exists($file)) include $file;
 }
 ?>
@@ -99,9 +102,9 @@ function load_view($path) {
     html.dark-mode input[type="password"],
     html.dark-mode textarea,
     html.dark-mode select {
-        background-color: var(--bg-tertiary);
-        color: var(--text-primary);
-        border-color: var(--border-color);
+        background-color: var(--bg-tertiary) !important;
+        color: var(--text-primary) !important;
+        border-color: rgba(58, 175, 169, 0.3) !important;
     }
 
     html.dark-mode input[type="text"]:focus,
@@ -109,8 +112,10 @@ function load_view($path) {
     html.dark-mode input[type="password"]:focus,
     html.dark-mode textarea:focus,
     html.dark-mode select:focus {
-        background-color: var(--bg-tertiary);
-        color: var(--text-primary);
+        background-color: var(--bg-tertiary) !important;
+        color: var(--text-primary) !important;
+        border-color: rgba(58, 175, 169, 0.5) !important;
+        box-shadow: 0 0 0 3px rgba(58, 175, 169, 0.1) !important;
     }
 
     /* HERO IMAGE: full height + extends downward */
@@ -350,15 +355,15 @@ if (isset($_GET['p'])) {
     switch ($_GET['p']) {
 
        case 'user_dashboard':
-            include __DIR__ . "/views/dashboard/user_dashboard.php";
+            include _DIR_ . "/views/dashboard/user_dashboard.php";
             break;
 
         case 'konselor_dashboard':
-            include __DIR__ . "/views/dashboard/konselor_dashboard.php";
+            include _DIR_ . "/views/dashboard/konselor_dashboard.php";
             break;
 
         case 'admin_dashboard':
-            include __DIR__ . "/views/dashboard/admin_dashboard.php";
+            include _DIR_ . "/views/dashboard/admin_dashboard.php";
             break;
 
         case 'login':
@@ -385,31 +390,43 @@ if (isset($_GET['p'])) {
             break;
 
         case 'api_chat':
-            require_once __DIR__ . '/controllers/handle_chat.php';
+            require_once _DIR_ . '/controllers/handle_chat.php';
             break;
 
         case 'delete_session':
-            require_once __DIR__ . '/controllers/handle_session.php';
+            require_once _DIR_ . '/controllers/handle_session.php';
             break;
 
         case 'match':
             load_view("matching/match_result");
             break;
+
+        case 'handle_konselor':
+            require_once _DIR_ . '/controllers/handle_konselor.php';
+            break;
+
+        case 'konselor_chat':
+            load_view("chat/konselor_chat");
+            break;
+
+        case 'konselor_settings':
+            load_view("dashboard/konselor_settings");
+            break;
         
         case 'update_profile':
-            require_once __DIR__ . '/controllers/UserController.php';
+            require_once _DIR_ . '/controllers/UserController.php';
             $userController = new UserController($conn);
             $userController->updateProfile();
             break;
         
         case 'upload_profile_picture':
-            require_once __DIR__ . '/controllers/UserController.php';
+            require_once _DIR_ . '/controllers/UserController.php';
             $userController = new UserController($conn);
             $userController->uploadProfilePicture();
             break;
         
         case 'change_password':
-            require_once __DIR__ . '/controllers/UserController.php';
+            require_once _DIR_ . '/controllers/UserController.php';
             $userController = new UserController($conn);
             $userController->changePassword();
             break;
@@ -428,7 +445,7 @@ if (isset($_GET['p'])) {
 
         // BARU: Controller untuk Upload Bukti Pembayaran
         case 'upload_payment_proof':
-            require_once __DIR__ . '/controllers/PaymentController.php';
+            require_once _DIR_ . '/controllers/PaymentController.php';
             $paymentController = new PaymentController($conn);
             $paymentController->uploadProof();
             break;
@@ -473,7 +490,7 @@ function toggleDarkMode() {
     // Update button icon if it exists
     const darkModeBtn = document.getElementById('darkModeToggle');
     if (darkModeBtn) {
-        darkModeBtn.textContent = isDarkMode ? '☀️' : '🌙';
+        darkModeBtn.textContent = isDarkMode ? '☀' : '🌙';
     }
 }
 

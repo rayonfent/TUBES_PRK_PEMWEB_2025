@@ -1,7 +1,7 @@
 <?php
 // views/survey/survey_form.php
 // session_start() already called in index.php
-require_once dirname(__DIR__, 2) . "/config/database.php";
+global $conn;
 
 $survey_error = "";
 

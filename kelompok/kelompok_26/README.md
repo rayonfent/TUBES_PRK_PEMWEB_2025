@@ -7,6 +7,12 @@
 # Judul & summary project
 ## Astral Psychologist - Website Konsultasi Mental Health dengan Fitur Chat Real-Time Konselor
 
+Platform konsultasi kesehatan mental yang dirancang untuk memberikan akses kepada pengguna untuk berkonsultasi dengan konselor profesional melalui sistem chat real-time. Sistem ini mencocokkan pengguna dengan konselor berdasarkan jawaban survei dan penilaian kepribadian untuk memastikan gaya komunikasi yang paling sesuai. Fitur utama dari proyek ini mencakup registrasi pengguna, login, pencocokan konselor, pesan real-time, dan pengelolaan langganan.
+
+## Fitur Utama 
+### 1. Registrasi Pengguna dan Login:
+- Pengguna dapat mendaftar dengan mengisi formulir berisi nama, email, dan kata sandi.
+- Setelah registrasi berhasil, pengguna akan diarahkan untuk mengisi survei preferensi.
 
 
 # Cara menjalankan aplikasi

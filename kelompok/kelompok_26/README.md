@@ -21,7 +21,6 @@ Platform konsultasi kesehatan mental yang dirancang untuk memberikan akses kepad
 - Konselor diberi skor kecocokan dan disortir berdasarkan skor tertinggi.
 ### 4. Chat Real-Time
 - Pengguna dapat melakukan chat dengan konselor melalui sesi chat real-time.
-- Sistem mendukung pengiriman pesan secara langsung menggunakan polling interval atau WebSocket.
 ### 5. Trial dan Langganan
 - Pengguna mendapatkan trial gratis 1 hari pada sesi pertama.
 - Setelah trial berakhir, pengguna harus berlangganan untuk melanjutkan penggunaan.

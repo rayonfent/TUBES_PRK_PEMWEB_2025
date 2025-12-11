@@ -271,23 +271,7 @@ if ($stmt) {
                 <?php endif; ?>
             </div>
 
-            <!-- QUICK ACTIONS -->
-            <div class="grid md:grid-cols-3 gap-6 mb-10">
-                <a href="index.php?p=konselor_chat" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.4s;">
-                    <div class="font-semibold text-[#17252A]">Chat dengan Klien</div>
-                    <div class="text-sm text-gray-500 mt-2">Kelola semua percakapan aktif</div>
-                </a>
 
-                <button onclick="openProfileModal()" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.5s; cursor: pointer; border: none; width: 100%; background: var(--bg-card);">
-                    <div class="font-semibold text-[#17252A]">Edit Profil</div>
-                    <div class="text-sm text-gray-500 mt-2">Perbarui data pribadi Anda</div>
-                </button>
-
-                <a href="index.php?p=logout" class="block p-6 card-gradient rounded-xl soft-shadow text-center hover:shadow-md card-animate" style="animation-delay: 0.6s;">
-                    <div class="font-semibold text-[#17252A]">Keluar</div>
-                    <div class="text-sm text-gray-500 mt-2">Logout dari akun Anda</div>
-                </a>
-            </div>
 
             </div>
         </main>

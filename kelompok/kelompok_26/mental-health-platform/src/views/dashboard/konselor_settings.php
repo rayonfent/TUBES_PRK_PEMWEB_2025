@@ -16,7 +16,22 @@ $konselor_id = $konselor['konselor_id'] ?? $konselor['id'] ?? null;
 $success_msg = $_SESSION['success'] ?? null;
 $error_msg = $_SESSION['error'] ?? null;
 unset($_SESSION['success'], $_SESSION['error']);
+
+// Fetch preferensi konselor dari database jika ada
+$communication_style = '';
+$approach_style = '';
+$stmt = $conn->prepare("SELECT communication_style, approach_style FROM konselor_profile WHERE konselor_id = ? LIMIT 1");
+if ($stmt) {
+    $stmt->bind_param("i", $konselor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $communication_style = $row['communication_style'] ?? '';
+        $approach_style = $row['approach_style'] ?? '';
+    }
+}
 ?>
+
 
 <div class="min-h-screen" style="background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 25%, var(--bg-primary) 50%, var(--bg-secondary) 75%, var(--bg-primary) 100%); position: relative; overflow: visible;">
 
@@ -78,8 +93,15 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);">Informasi Profil</h2>
 
                         <div class="flex items-center gap-4 mb-8">
-                            <img src="<?= isset($konselor['profile_picture']) && $konselor['profile_picture'] ? "../uploads/konselor/".htmlspecialchars($konselor['profile_picture']) : 'https://via.placeholder.com/100x100?text=Konselor' ?>"
-                                 alt="avatar" class="w-24 h-24 object-cover rounded-xl shadow-sm">
+                            <div class="relative">
+                                <img id="profilePictureDisplay" src="<?= isset($konselor['profile_picture']) && $konselor['profile_picture'] ? "../uploads/konselor/".htmlspecialchars($konselor['profile_picture']) : 'https://via.placeholder.com/100x100?text=Konselor' ?>"
+                                     alt="avatar" class="w-24 h-24 object-cover rounded-xl shadow-sm">
+                                <button type="button" onclick="openPhotoModal()" class="absolute bottom-0 right-0 bg-[#3AAFA9] text-white p-2 rounded-full shadow-lg hover:bg-[#2fb39a] transition">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 17.25V21h3.75L17.81 9.94m-2.12-2.12l2.83-2.83a2.828 2.828 0 114 4l-2.83 2.83m-5.75 5.75L9 3"></path>
+                                    </svg>
+                                </button>
+                            </div>
                             <div>
                                 <h3 style="color: var(--text-primary); font-weight: 600; font-size: 16px;"><?= htmlspecialchars($konselor['name']) ?></h3>
                                 <p style="color: var(--text-secondary); font-size: 14px;"><?= htmlspecialchars($konselor['email']) ?></p>
@@ -115,6 +137,43 @@ unset($_SESSION['success'], $_SESSION['error']);
                                           rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);"><?= htmlspecialchars($konselor['bio'] ?? '') ?></textarea>
                             </div>
 
+                            <!-- PREFERENSI KONSELOR -->
+                            <div class="border-t pt-6 mt-6">
+                                <h3 class="text-lg font-bold mb-4" style="color: var(--text-primary);">Preferensi Konsultasi</h3>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Gaya Komunikasi</label>
+                                        <select id="input_communication_style" class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                                            <option value="">-- Pilih Gaya Komunikasi --</option>
+                                            <option value="S" <?= ($communication_style === 'S') ? 'selected' : '' ?>>Supportive (Mendukung)</option>
+                                            <option value="G" <?= ($communication_style === 'G') ? 'selected' : '' ?>>Guiding (Membimbing)</option>
+                                            <option value="B" <?= ($communication_style === 'B') ? 'selected' : '' ?>>Balanced (Seimbang)</option>
+                                        </select>
+                                        <p style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">Pilih gaya komunikasi yang Anda gunakan dalam sesi konsultasi</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Pendekatan Terapi</label>
+                                        <select id="input_approach_style" class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                                            <option value="">-- Pilih Pendekatan Terapi --</option>
+                                            <option value="O" <?= ($approach_style === 'O') ? 'selected' : '' ?>>Oriented (Berorientasi pada Tujuan)</option>
+                                            <option value="D" <?= ($approach_style === 'D') ? 'selected' : '' ?>>Directive (Direktif)</option>
+                                            <option value="B" <?= ($approach_style === 'B') ? 'selected' : '' ?>>Balanced (Seimbang)</option>
+                                        </select>
+                                        <p style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">Pilih pendekatan terapi yang Anda terapkan</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Pengalaman (Tahun)</label>
+                                        <input type="number" id="input_experience_years" placeholder="Contoh: 5" 
+                                               value="<?= htmlspecialchars($konselor['experience_years'] ?? '0') ?>"
+                                               min="0" max="60"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                                    </div>
+                                </div>
+                            </div>
+
                             <button type="submit" class="w-full mt-6 px-4 py-2 bg-[#3AAFA9] text-white rounded-lg font-semibold">Simpan Perubahan</button>
                         </form>
                     </div>
@@ -124,6 +183,12 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <h2 class="text-xl font-bold mb-6" style="color: var(--text-primary);">Keamanan Akun</h2>
 
                         <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Password Lama</label>
+                                <input type="password" id="input_password_old" placeholder="Masukkan password lama Anda" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg" style="background: var(--bg-secondary); color: var(--text-primary);">
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Password Baru</label>
                                 <input type="password" id="input_password" placeholder="Kosongkan jika tidak ingin mengubah" 
@@ -158,6 +223,31 @@ unset($_SESSION['success'], $_SESSION['error']);
         </main>
     </div>
 
+</div>
+
+<!-- MODAL UPLOAD FOTO PROFIL -->
+<div id="photoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; flex-items:center; justify-content:center;" class="flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4" style="color: var(--text-primary);">
+        <h2 class="text-2xl font-bold mb-6">Ubah Foto Profil</h2>
+
+        <form id="photoForm">
+            <div class="mb-6 text-center">
+                <div id="photoPreview" style="width:150px; height:150px; margin:0 auto; background:var(--bg-secondary); border:2px dashed var(--border-color); border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+                    <span style="color:var(--text-secondary); font-size:14px;">Preview Foto</span>
+                </div>
+                <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="previewPhoto(event)">
+                <button type="button" onclick="document.getElementById('photoInput').click()" class="px-4 py-2 bg-[#3AAFA9] text-white rounded-lg font-semibold">
+                    Pilih Foto
+                </button>
+                <p style="color:var(--text-secondary); font-size:12px; margin-top:8px;">Format: JPG, PNG (Maks 5MB)</p>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closePhotoModal()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg">Batal</button>
+                <button type="submit" class="flex-1 px-4 py-2 bg-[#3AAFA9] text-white rounded-lg">Simpan Foto</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <style>
@@ -205,6 +295,71 @@ html.dark-mode .card-gradient {
 </style>
 
 <script>
+// Modal functions
+function openPhotoModal() {
+    document.getElementById('photoModal').style.display = 'flex';
+    document.getElementById('photoInput').value = '';
+    document.getElementById('photoPreview').innerHTML = '<span style="color:var(--text-secondary); font-size:14px;">Preview Foto</span>';
+}
+
+function closePhotoModal() {
+    document.getElementById('photoModal').style.display = 'none';
+}
+
+function previewPhoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Photo form submission
+document.getElementById('photoForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const photoInput = document.getElementById('photoInput');
+    if (!photoInput.files || photoInput.files.length === 0) {
+        alert('Pilih foto terlebih dahulu');
+        return;
+    }
+
+    const file = photoInput.files[0];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        alert('Ukuran foto tidak boleh lebih dari 5MB');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'upload_photo');
+    formData.append('photo', file);
+
+    fetch('index.php?p=handle_konselor', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Foto profil berhasil diperbarui!');
+            document.getElementById('profilePictureDisplay').src = data.photo_url;
+            closePhotoModal();
+        } else {
+            alert('Error: ' + (data.message || 'Gagal mengupload foto'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat mengupload foto.');
+    });
+});
+
+// Profile form submission
 document.getElementById('profileForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -213,14 +368,20 @@ document.getElementById('profileForm').addEventListener('submit', function(e) {
     const specialization = document.getElementById('input_specialization').value.trim();
     const bio = document.getElementById('input_bio').value.trim();
     const password = document.getElementById('input_password').value.trim();
+    const password_old = document.getElementById('input_password_old').value.trim();
 
     if (!name || !email) {
         alert('Nama dan email tidak boleh kosong');
         return;
     }
 
+    if (password && !password_old) {
+        alert('Masukkan password lama untuk mengubah password');
+        return;
+    }
+
     if (password && password.length < 8) {
-        alert('Password harus minimal 8 karakter');
+        alert('Password baru harus minimal 8 karakter');
         return;
     }
 
@@ -233,7 +394,11 @@ function submitProfileForm() {
     const specialization = document.getElementById('input_specialization').value.trim();
     const bio = document.getElementById('input_bio').value.trim();
     const password = document.getElementById('input_password').value.trim();
+    const password_old = document.getElementById('input_password_old').value.trim();
     const password_confirm = document.getElementById('input_password_confirm').value.trim();
+    const communication_style = document.getElementById('input_communication_style').value.trim();
+    const approach_style = document.getElementById('input_approach_style').value.trim();
+    const experience_years = document.getElementById('input_experience_years').value.trim();
 
     if (password && password !== password_confirm) {
         alert('Password konfirmasi tidak cocok');
@@ -246,7 +411,14 @@ function submitProfileForm() {
     formData.append('email', email);
     formData.append('specialization', specialization);
     formData.append('bio', bio);
-    if (password) formData.append('password', password);
+    formData.append('communication_style', communication_style);
+    formData.append('approach_style', approach_style);
+    formData.append('experience_years', experience_years);
+    
+    if (password) {
+        formData.append('password', password);
+        formData.append('password_old', password_old);
+    }
 
     fetch('index.php?p=handle_konselor', {
         method: 'POST',
@@ -266,4 +438,9 @@ function submitProfileForm() {
         alert('Terjadi kesalahan saat mengirim data.');
     });
 }
+
+// Close modal when clicking outside
+document.getElementById('photoModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closePhotoModal();
+});
 </script>

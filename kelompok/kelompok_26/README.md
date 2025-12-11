@@ -13,7 +13,23 @@ Platform konsultasi kesehatan mental yang dirancang untuk memberikan akses kepad
 ### 1. Registrasi Pengguna dan Login:
 - Pengguna dapat mendaftar dengan mengisi formulir berisi nama, email, dan kata sandi.
 - Setelah registrasi berhasil, pengguna akan diarahkan untuk mengisi survei preferensi.
+### 2. Survei Preferensi
+- Pengguna mengisi survei untuk menentukan gaya komunikasi dan pendekatan emosional mereka.
+- Berdasarkan jawaban survei, sistem akan menentukan kepribadian pengguna (gaya komunikasi: direct/gentle, pendekatan: logical/emotional).
+### 3. Pencocokan Konselor
+- Pengguna akan dicocokkan dengan konselor yang memiliki profil serupa berdasarkan hasil survei.
+- Konselor diberi skor kecocokan dan disortir berdasarkan skor tertinggi.
+### 4. Chat Real-Time
+- Pengguna dapat melakukan chat dengan konselor melalui sesi chat real-time.
+- Sistem mendukung pengiriman pesan secara langsung menggunakan polling interval atau WebSocket.
+### 5. Trial dan Langganan
+- Pengguna mendapatkan trial gratis 1 hari pada sesi pertama.
+- Setelah trial berakhir, pengguna harus berlangganan untuk melanjutkan penggunaan.
+### 6. Dashboard Pengguna:
+- Dashboard pengguna menampilkan informasi profil, gaya komunikasi, pendekatan emosional, riwayat sesi, dan status pembayaran.
+- Pengguna dapat melanjutkan sesi aktif, mengisi survei ulang, mencari konselor baru, atau mengelola langganan mereka.
 
+---
 
 # Cara menjalankan aplikasi
 
